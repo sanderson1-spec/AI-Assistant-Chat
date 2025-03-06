@@ -16,6 +16,8 @@ app = FastAPI(title="AI Assistant")
 
 # Set up static files and templates
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/static/css", StaticFiles(directory="app/static/css"), name="css")
+app.mount("/static/js", StaticFiles(directory="app/static/js"), name="js")
 templates = Jinja2Templates(directory="app/static")
 
 # Initialize database
@@ -56,9 +58,14 @@ async def get_conversations(user_id: str = "default_user"):
     return {"conversations": conversations}
 
 @app.get("/api/conversations/{conversation_id}")
-async def get_conversation(conversation_id: str, user_id: str = "default_user"):
-    messages = await db.get_conversation_history(conversation_id)
+async def get_conversation(conversation_id: str, user_id: str = "default_user", include_all_versions: bool = True):
+    messages = await db.get_conversation_history(conversation_id, include_all_versions=include_all_versions)
     return {"messages": messages}
+
+@app.get("/api/messages/{message_id}/versions")
+async def get_message_versions(message_id: str, role: str = "assistant"):
+    versions = await db.get_message_versions(message_id, role)
+    return {"versions": versions}
 
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str):
@@ -71,15 +78,29 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             user_id = data.get("user_id", "default_user")
             message = data.get("message", "")
             conversation_id = data.get("conversation_id")
+            is_regeneration = data.get("regenerate", False)
+            is_edit = data.get("edit", False)
+            original_message_id = data.get("original_message_id")
             
             print(f"Received message from client {client_id}: {message[:30]}...")
             
             # Store user message
-            message_id, conv_id = await db.store_message(
+            message_metadata = {}
+            if is_edit and original_message_id:
+                message_metadata["edited"] = True
+                message_metadata["originalId"] = original_message_id
+                message_id = original_message_id
+            else:
+                message_id = f"msg_{uuid.uuid4()}"
+                
+            # Store the user message
+            db_message_id, conv_id, stored_message_id = await db.store_message(
                 user_id, 
                 message, 
                 "user", 
-                conversation_id
+                conversation_id,
+                metadata=message_metadata,
+                message_id=message_id
             )
             
             # For simplicity, let's just use the latest message
@@ -99,14 +120,25 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                 response = f"Error connecting to LMStudio: {str(e)}"
             
             # Store assistant message
-            await db.store_message(user_id, response, "assistant", conv_id)
+            assistant_metadata = {"responseToId": stored_message_id}
+            _, _, assistant_message_id = await db.store_message(
+                user_id, 
+                response, 
+                "assistant", 
+                conv_id, 
+                metadata=assistant_metadata,
+                response_to_id=stored_message_id,
+                is_regeneration=is_regeneration
+            )
             
             # Send response back to client
             await manager.send_message(client_id, {
                 "type": "message",
                 "conversation_id": conv_id,
                 "content": response,
-                "role": "assistant"
+                "role": "assistant",
+                "message_id": assistant_message_id,
+                "response_to_id": stored_message_id
             })
 
     except WebSocketDisconnect:
