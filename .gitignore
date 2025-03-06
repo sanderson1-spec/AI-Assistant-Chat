@@ -1,0 +1,5 @@
+# Virtual Environment
+venv/
+
+# Specifically ignore large PyTorch libraries
+**/libtorch_cpu.dylib
