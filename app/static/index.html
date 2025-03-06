@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Assistant</title>
     <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- Load utility modules first -->
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/message-formatter.js"></script>
+    
+    <!-- Load feature modules -->
+    <script src="/static/js/websocket.js"></script>
+    <script src="/static/js/ui-controller.js"></script>
+    <script src="/static/js/message-handlers.js"></script>
+    <script src="/static/js/conversation-manager.js"></script>
+    
+    <!-- Load main app last -->
+    <script src="/static/js/app.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -20,7 +32,5 @@
             </div>
         </div>
     </div>
-    
-    <script src="/static/js/app.js"></script>
 </body>
 </html>
