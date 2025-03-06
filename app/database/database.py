@@ -19,20 +19,32 @@ class Database:
         conn = self.get_connection()
         cursor = conn.cursor()
         
-        # Messages table
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT NOT NULL,
-            timestamp TEXT NOT NULL,
-            content TEXT NOT NULL,
-            role TEXT NOT NULL,
-            conversation_id TEXT NOT NULL,
-            metadata TEXT,
-            message_id TEXT,
-            version INTEGER DEFAULT 1
-        )
-        """)
+        # Check if the messages table already exists
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='messages'")
+        table_exists = cursor.fetchone() is not None
+        
+        if not table_exists:
+            # Create the messages table with the message_id column
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                message_id TEXT,
+                user_id TEXT NOT NULL,
+                timestamp TEXT NOT NULL,
+                content TEXT NOT NULL,
+                role TEXT NOT NULL,
+                conversation_id TEXT NOT NULL,
+                metadata TEXT
+            )
+            """)
+        else:
+            # Check if the message_id column exists, add it if it doesn't
+            cursor.execute("PRAGMA table_info(messages)")
+            columns = [info[1] for info in cursor.fetchall()]
+            
+            if "message_id" not in columns:
+                print("Adding message_id column to messages table...")
+                cursor.execute("ALTER TABLE messages ADD COLUMN message_id TEXT")
         
         # Conversations table for metadata
         cursor.execute("""
@@ -49,9 +61,10 @@ class Database:
         conn.close()
         print("Database initialized successfully")
     
-    async def store_message(self, user_id, content, role, conversation_id=None, metadata=None, message_id=None, is_regeneration=False, response_to_id=None):
+    async def store_message(self, user_id, content, role, conversation_id=None, metadata=None):
         """Store a message in the database"""
         timestamp = datetime.utcnow().isoformat()
+        message_id = f"msg_{timestamp}_{user_id}"
         
         # Generate a conversation ID if not provided
         if conversation_id is None:
@@ -61,56 +74,30 @@ class Database:
         else:
             # Update conversation timestamp
             await self.update_conversation_timestamp(conversation_id)
-        
-        # Process metadata
-        metadata_dict = metadata if metadata else {}
-        
-        # For assistant messages that are responses to user messages
-        if role == 'assistant' and response_to_id:
-            metadata_dict['responseToId'] = response_to_id
-        
-        # Generate a unique message ID if not provided
-        if not message_id:
-            message_id = f"msg_{timestamp}_{user_id}"
             
-        version = 1
-        if is_regeneration and role == 'assistant':
-            # Find the highest version number for this message
-            conn = self.get_connection()
-            cursor = conn.cursor()
-            cursor.execute("""
-                SELECT MAX(version) FROM messages 
-                WHERE message_id = ? AND role = 'assistant'
-            """, (response_to_id,))
-            result = cursor.fetchone()
-            if result and result[0]:
-                version = result[0] + 1
-            conn.close()
-        
         # Store in database
         conn = self.get_connection()
         cursor = conn.cursor()
         
         cursor.execute("""
         INSERT INTO messages 
-        (user_id, timestamp, content, role, conversation_id, metadata, message_id, version) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        (message_id, user_id, timestamp, content, role, conversation_id, metadata) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (
+            message_id,
             user_id, 
             timestamp, 
             content, 
             role, 
             conversation_id,
-            json.dumps(metadata_dict),
-            message_id,
-            version
+            json.dumps(metadata) if metadata else None
         ))
         
-        db_message_id = cursor.lastrowid
+        db_id = cursor.lastrowid
         conn.commit()
         conn.close()
         
-        return db_message_id, conversation_id, message_id
+        return db_id, conversation_id, message_id
     
     async def create_conversation(self, conversation_id, user_id, title=None):
         """Create a new conversation"""
@@ -150,70 +137,31 @@ class Database:
         conn.commit()
         conn.close()
     
-    async def get_conversation_history(self, conversation_id, limit=100, include_all_versions=False):
+    async def get_conversation_history(self, conversation_id, limit=100):
         """Get messages from a specific conversation"""
         conn = self.get_connection()
         cursor = conn.cursor()
         
-        if include_all_versions:
-            # Include all message versions
-            cursor.execute("""
-            SELECT id, user_id, timestamp, content, role, metadata, message_id, version
-            FROM messages
-            WHERE conversation_id = ?
-            ORDER BY timestamp ASC
-            """, (conversation_id,))
-        else:
-            # Only include the latest version of each message
-            cursor.execute("""
-            SELECT m1.id, m1.user_id, m1.timestamp, m1.content, m1.role, m1.metadata, m1.message_id, m1.version
-            FROM messages m1
-            JOIN (
-                SELECT message_id, role, MAX(version) as max_version
-                FROM messages
-                WHERE conversation_id = ?
-                GROUP BY message_id, role
-            ) m2 ON m1.message_id = m2.message_id AND m1.version = m2.max_version AND m1.role = m2.role
-            WHERE m1.conversation_id = ?
-            ORDER BY m1.timestamp ASC
-            """, (conversation_id, conversation_id))
+        cursor.execute("""
+        SELECT id, message_id, user_id, timestamp, content, role, metadata
+        FROM messages
+        WHERE conversation_id = ?
+        ORDER BY timestamp ASC
+        LIMIT ?
+        """, (conversation_id, limit))
         
         messages = cursor.fetchall()
         conn.close()
         
         return [{
             "id": row[0],
-            "user_id": row[1],
-            "timestamp": row[2],
-            "content": row[3],
-            "role": row[4],
-            "metadata": json.loads(row[5]) if row[5] else None,
-            "message_id": row[6],
-            "version": row[7]
+            "message_id": row[1],
+            "user_id": row[2],
+            "timestamp": row[3],
+            "content": row[4],
+            "role": row[5],
+            "metadata": json.loads(row[6]) if row[6] else None
         } for row in messages]
-    
-    async def get_message_versions(self, message_id, role='assistant'):
-        """Get all versions of a specific message"""
-        conn = self.get_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute("""
-        SELECT id, timestamp, content, version, metadata
-        FROM messages
-        WHERE message_id = ? AND role = ?
-        ORDER BY version ASC
-        """, (message_id, role))
-        
-        versions = cursor.fetchall()
-        conn.close()
-        
-        return [{
-            "id": row[0],
-            "timestamp": row[1],
-            "content": row[2],
-            "version": row[3],
-            "metadata": json.loads(row[4]) if row[4] else None
-        } for row in versions]
     
     async def get_recent_conversations(self, user_id, limit=10):
         """Get recent conversations for a user"""

@@ -1,32 +1,46 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, Depends, HTTPException
+"""
+FastAPI application main module for the AI Assistant.
+Handles HTTP routes and WebSocket connections.
+"""
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import os
 import json
-import uuid
-from typing import List, Dict, Optional
-import asyncio
+import logging
+from typing import Dict
 
+from app.config import CONFIG, DEBUG, logger
 from app.database.database import Database
 from app.llm.lmstudio_client import LMStudioClient
 
+# Create a module-specific logger
+logger = logging.getLogger("ai-assistant.main")
+
 # Create FastAPI app
 app = FastAPI(title="AI Assistant")
+logger.info("FastAPI application initialized")
 
 # Set up static files and templates
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
-app.mount("/static/css", StaticFiles(directory="app/static/css"), name="css")
-app.mount("/static/js", StaticFiles(directory="app/static/js"), name="js")
 templates = Jinja2Templates(directory="app/static")
+logger.info("Static files and templates configured")
 
 # Initialize database
-db = Database(db_path="data/assistant.db")
+try:
+    db = Database(db_path=CONFIG["database"]["path"])
+    logger.info("Database connection established")
+except Exception as e:
+    logger.error(f"Failed to initialize database: {str(e)}", exc_info=DEBUG)
+    raise
 
 # Initialize LMStudio client
-lmstudio_url = os.environ.get("LMSTUDIO_URL", "http://192.168.178.182:1234/v1")
-llm_client = LMStudioClient(base_url=lmstudio_url)
-print(f"Connecting to LMStudio at: {lmstudio_url}")
+try:
+    llm_client = LMStudioClient(base_url=CONFIG["lmstudio"]["url"])
+    logger.info(f"LMStudio client initialized with URL: {CONFIG['lmstudio']['url']}")
+except Exception as e:
+    logger.error(f"Failed to initialize LMStudio client: {str(e)}", exc_info=DEBUG)
+    raise
 
 # WebSocket connection manager
 class ConnectionManager:
@@ -36,14 +50,18 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket, client_id: str):
         await websocket.accept()
         self.active_connections[client_id] = websocket
+        logger.info(f"Client {client_id} connected. Active connections: {len(self.active_connections)}")
     
     def disconnect(self, client_id: str):
         if client_id in self.active_connections:
             del self.active_connections[client_id]
+            logger.info(f"Client {client_id} disconnected. Remaining connections: {len(self.active_connections)}")
     
     async def send_message(self, client_id: str, message: dict):
         if client_id in self.active_connections:
             await self.active_connections[client_id].send_json(message)
+            if DEBUG:
+                logger.debug(f"Message sent to client {client_id}: {message.get('type')}")
 
 manager = ConnectionManager()
 
@@ -54,115 +72,125 @@ async def get_home(request: Request):
 
 @app.get("/api/conversations")
 async def get_conversations(user_id: str = "default_user"):
-    conversations = await db.get_recent_conversations(user_id)
-    return {"conversations": conversations}
+    try:
+        conversations = await db.get_recent_conversations(user_id)
+        if DEBUG:
+            logger.debug(f"Retrieved {len(conversations)} conversations for user {user_id}")
+        return {"conversations": conversations}
+    except Exception as e:
+        logger.error(f"Error retrieving conversations: {str(e)}", exc_info=DEBUG)
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/conversations/{conversation_id}")
-async def get_conversation(conversation_id: str, user_id: str = "default_user", include_all_versions: bool = True):
-    messages = await db.get_conversation_history(conversation_id, include_all_versions=include_all_versions)
-    return {"messages": messages}
-
-@app.get("/api/messages/{message_id}/versions")
-async def get_message_versions(message_id: str, role: str = "assistant"):
-    versions = await db.get_message_versions(message_id, role)
-    return {"versions": versions}
+async def get_conversation(conversation_id: str, user_id: str = "default_user"):
+    try:
+        messages = await db.get_conversation_history(conversation_id)
+        if DEBUG:
+            logger.debug(f"Retrieved {len(messages)} messages for conversation {conversation_id}")
+        return {"messages": messages}
+    except Exception as e:
+        logger.error(f"Error retrieving conversation messages: {str(e)}", exc_info=DEBUG)
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str):
     await manager.connect(websocket, client_id)
+    
     try:
         while True:
+            # Wait for a message from the client
             data = await websocket.receive_json()
             
             # Process the incoming message
             user_id = data.get("user_id", "default_user")
             message = data.get("message", "")
             conversation_id = data.get("conversation_id")
-            is_regeneration = data.get("regenerate", False)
-            is_edit = data.get("edit", False)
-            original_message_id = data.get("original_message_id")
             
-            print(f"Received message from client {client_id}: {message[:30]}...")
+            logger.info(f"Received message from client {client_id}: {message[:30]}...")
             
             # Store user message
-            message_metadata = {}
-            if is_edit and original_message_id:
-                message_metadata["edited"] = True
-                message_metadata["originalId"] = original_message_id
-                message_id = original_message_id
-            else:
-                message_id = f"msg_{uuid.uuid4()}"
-                
-            # Store the user message
-            db_message_id, conv_id, stored_message_id = await db.store_message(
-                user_id, 
-                message, 
-                "user", 
-                conversation_id,
-                metadata=message_metadata,
-                message_id=message_id
-            )
+            try:
+                db_message_id, conv_id, stored_message_id = await db.store_message(
+                    user_id, 
+                    message, 
+                    "user", 
+                    conversation_id
+                )
+                if DEBUG:
+                    logger.debug(f"User message stored with ID {db_message_id} in conversation {conv_id}")
+            except Exception as e:
+                logger.error(f"Error storing user message: {str(e)}", exc_info=DEBUG)
+                await manager.send_message(client_id, {
+                    "type": "message",
+                    "content": f"Error: Could not store your message. Please try again.",
+                    "role": "system"
+                })
+                continue
             
-            # For simplicity, let's just use the latest message
-            # This mimics your curl test which only sent one message
+            # Create message for LLM
             llm_messages = [{"role": "user", "content": message}]
             
             # Generate response from LLM
             try:
-                print("Requesting response from LMStudio...")
-                print(f"Sending message: {json.dumps(llm_messages)}")
+                logger.info("Requesting response from LMStudio...")
+                if DEBUG:
+                    logger.debug(f"Sending message to LMStudio: {json.dumps(llm_messages)}")
+                
                 response = await llm_client.generate_response(llm_messages)
-                print(f"Received response from LMStudio: {response[:30]}...")
+                
+                logger.info(f"Received response from LMStudio: {response[:30]}...")
             except Exception as e:
-                import traceback
-                print(f"Error calling LMStudio: {str(e)}")
-                print(traceback.format_exc())
-                response = f"Error connecting to LMStudio: {str(e)}"
+                logger.error(f"Error calling LMStudio: {str(e)}", exc_info=DEBUG)
+                response = f"Error connecting to LMStudio. Please check if the server is running and try again."
             
             # Store assistant message
-            assistant_metadata = {"responseToId": stored_message_id}
-            _, _, assistant_message_id = await db.store_message(
-                user_id, 
-                response, 
-                "assistant", 
-                conv_id, 
-                metadata=assistant_metadata,
-                response_to_id=stored_message_id,
-                is_regeneration=is_regeneration
-            )
+            try:
+                await db.store_message(user_id, response, "assistant", conv_id)
+                if DEBUG:
+                    logger.debug("Assistant response stored in database")
+            except Exception as e:
+                logger.error(f"Error storing assistant response: {str(e)}", exc_info=DEBUG)
             
             # Send response back to client
             await manager.send_message(client_id, {
                 "type": "message",
                 "conversation_id": conv_id,
                 "content": response,
-                "role": "assistant",
-                "message_id": assistant_message_id,
-                "response_to_id": stored_message_id
+                "role": "assistant"
             })
 
     except WebSocketDisconnect:
-        print(f"Client {client_id} disconnected")
         manager.disconnect(client_id)
     except Exception as e:
-        print(f"WebSocket error with client {client_id}: {str(e)}")
-        import traceback
-        print(traceback.format_exc())
+        logger.error(f"WebSocket error with client {client_id}: {str(e)}", exc_info=DEBUG)
         manager.disconnect(client_id)
 
 @app.delete("/api/conversations/{conversation_id}")
 async def delete_conversation(conversation_id: str, user_id: str = "default_user"):
     success = await db.delete_conversation(conversation_id)
     if success:
+        logger.info(f"Conversation {conversation_id} deleted")
         return {"status": "success", "message": f"Conversation {conversation_id} deleted"}
     else:
+        logger.error(f"Failed to delete conversation {conversation_id}")
         raise HTTPException(status_code=500, detail="Failed to delete conversation")
 
 @app.delete("/api/conversations")
 async def clear_all_conversations(user_id: str = "default_user"):
     count = await db.clear_all_conversations(user_id)
+    logger.info(f"Deleted {count} conversations for user {user_id}")
     return {"status": "success", "message": f"Deleted {count} conversations"}
+
+# Application startup event
+@app.on_event("startup")
+async def startup_event():
+    logger.info("AI Assistant application started")
+
+# Application shutdown event
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger.info("AI Assistant application shutting down")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8001, reload=True)
