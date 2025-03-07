@@ -311,7 +311,7 @@ const MessageHandler = {
             
         } catch (error) {
             console.error('Error saving edit:', error);
-            this.displaySystemMessage('Failed to save your edit. Please try again.');
+            this.displaySystemMessage('Failed to save your edit. Please try again.', 5000);
         }
     },
     
@@ -376,11 +376,14 @@ const MessageHandler = {
                     
                     // Add version selector after regenerating
                     this.loadAndShowVersionSelector(parentId);
+                    
+                    // Show success message
+                    this.displaySystemMessage('Response regenerated successfully', 2000);
                 })
                 .catch(error => {
                     console.error('Error regenerating response:', error);
                     contentDiv.textContent = originalContent;
-                    this.displaySystemMessage('Failed to regenerate response. Please try again.');
+                    this.displaySystemMessage('Failed to regenerate response. Please try again.', 5000);
                 });
         }
     },
@@ -513,9 +516,12 @@ const MessageHandler = {
             // Send selection to server
             this.sendSelectVersionRequest(messageId, parentId);
             
+            // Show brief confirmation
+            this.displaySystemMessage('Version selected', 2000);
+            
         } catch (error) {
             console.error('Error selecting version:', error);
-            this.displaySystemMessage('Failed to select version. Please try again.');
+            this.displaySystemMessage('Failed to select version. Please try again.', 5000);
         }
     },
     
@@ -576,6 +582,21 @@ const MessageHandler = {
             el.style.pointerEvents = 'none';
         });
         
+        // Check for temporary IDs
+        if (messageId.toString().startsWith('temp-')) {
+            this.displaySystemMessage('Cannot delete an unsaved message. Please wait for the message to be processed.', 5000);
+            
+            // Restore elements
+            messageDiv.style.opacity = '1';
+            messageDiv.style.pointerEvents = 'auto';
+            responseElements.forEach(el => {
+                el.style.opacity = '1';
+                el.style.pointerEvents = 'auto';
+            });
+            
+            return;
+        }
+        
         // Send delete request to server
         fetch(`/api/messages/${messageId}`, {
             method: 'DELETE',
@@ -604,6 +625,9 @@ const MessageHandler = {
             } else if (role === 'assistant' && this.lastResponseId == messageId) {
                 this.lastResponseId = null;
             }
+            
+            // Show a brief success message
+            this.displaySystemMessage('Message deleted successfully', 2000);
         })
         .catch(error => {
             console.error('Error deleting message:', error);
@@ -616,7 +640,7 @@ const MessageHandler = {
                 el.style.pointerEvents = 'auto';
             });
             
-            this.displaySystemMessage('Failed to delete message. Please try again.');
+            this.displaySystemMessage('Failed to delete message. Please try again.', 5000);
         });
     },
     
@@ -636,12 +660,18 @@ const MessageHandler = {
         
         // Check if this is a temporary message ID (client-side only, not in database yet)
         if (messageId.toString().startsWith('temp-')) {
-            this.displaySystemMessage('Cannot rewind to an unsaved message. Please wait for the message to be processed.');
+            this.displaySystemMessage('Cannot rewind to an unsaved message. Please wait for the message to be processed.', 5000);
             return;
         }
         
-        // Show loading indicator
-        this.displaySystemMessage('Rewinding conversation...');
+        // Show loading indicator (no auto-dismiss for this one since we'll replace it)
+        const loadingMessageId = 'loading-' + Date.now();
+        const loadingMessage = this.createMessageElement({
+            id: loadingMessageId,
+            content: 'Rewinding conversation...',
+            role: 'system'
+        });
+        UIController.addMessageToChat(loadingMessage);
         
         // Send rewind request to server
         fetch(`/api/messages/${messageId}/rewind`, {
@@ -661,6 +691,12 @@ const MessageHandler = {
             return response.json();
         })
         .then(data => {
+            // Remove the loading message
+            const loadingElement = document.querySelector(`.message[data-message-id="${loadingMessageId}"]`);
+            if (loadingElement) {
+                loadingElement.remove();
+            }
+            
             // If successful, reload the conversation
             UIController.clearChatMessages();
             
@@ -681,13 +717,50 @@ const MessageHandler = {
                 }
             });
             
-            // Display success message
-            this.displaySystemMessage('Conversation rewound successfully');
+            // Display success message that auto-dismisses after 2 seconds
+            this.displaySystemMessage('Conversation rewound successfully', 2000);
         })
         .catch(error => {
+            // Remove the loading message
+            const loadingElement = document.querySelector(`.message[data-message-id="${loadingMessageId}"]`);
+            if (loadingElement) {
+                loadingElement.remove();
+            }
+            
             console.error('Error rewinding conversation:', error);
-            this.displaySystemMessage('Failed to rewind conversation. Please try again.');
+            this.displaySystemMessage('Failed to rewind conversation. Please try again.', 5000);
         });
+    },
+    
+    /**
+     * Display a system message in the chat that auto-dismisses
+     * @param {string} message - The system message
+     * @param {number} timeout - Time in milliseconds before the message disappears (default 3000ms)
+     */
+    displaySystemMessage: function(message, timeout = 3000) {
+        const messageId = 'system-' + Date.now();
+        const messageElement = this.createMessageElement({
+            id: messageId,
+            content: message,
+            role: 'system'
+        });
+        
+        UIController.addMessageToChat(messageElement);
+        
+        // Auto-dismiss after timeout
+        setTimeout(() => {
+            const systemMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
+            if (systemMessage) {
+                // Add fade-out animation
+                systemMessage.style.opacity = '0';
+                systemMessage.style.transition = 'opacity 0.5s ease';
+                
+                // Remove from DOM after animation completes
+                setTimeout(() => {
+                    systemMessage.remove();
+                }, 500); // 500ms for the fade-out animation
+            }
+        }, timeout);
     },
     
     /**
@@ -702,14 +775,6 @@ const MessageHandler = {
             role: role
         });
         UIController.addMessageToChat(messageElement);
-    },
-    
-    /**
-     * Display a system message in the chat
-     * @param {string} message - The system message
-     */
-    displaySystemMessage: function(message) {
-        this.displayMessage(message, 'system');
     },
     
     /**

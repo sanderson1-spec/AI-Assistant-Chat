@@ -354,3 +354,86 @@ body, html {
     color: #4285f4;
     background-color: rgba(66, 133, 244, 0.1);
 }
+
+/* System message styling with transition support */
+.system-message {
+    background-color: #fff4e5;
+    margin: 10px auto;
+    text-align: center;
+    font-style: italic;
+    max-width: 90%;
+    padding: 8px 15px;
+    border-radius: 8px;
+    border-left: 3px solid #ff9800;
+    transition: opacity 0.5s ease;
+}
+
+/* Specific styling for delete and rewind buttons */
+.delete-action {
+    color: #e53935;
+}
+
+.delete-action:hover {
+    color: #ffffff;
+    background-color: rgba(229, 57, 53, 0.8);
+}
+
+.rewind-action {
+    color: #ff9800;
+}
+
+.rewind-action:hover {
+    color: #ffffff;
+    background-color: rgba(255, 152, 0, 0.8);
+}
+
+/* Expand the message actions area for more buttons */
+.message-actions {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    display: none;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.message:hover .message-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+/* Add a faded effect to show messages being deleted or hidden */
+.message.deleting {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+/* Animation for rewind operation */
+@keyframes flash {
+    0% { background-color: rgba(255, 152, 0, 0.3); }
+    50% { background-color: rgba(255, 152, 0, 0.1); }
+    100% { background-color: transparent; }
+}
+
+.message.rewinding {
+    animation: flash 1s ease;
+}
+
+/* Make action buttons more visible and organized */
+.action-button {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    margin-left: 2px;
+    font-size: 12px;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.action-button:hover {
+    color: #4285f4;
+    background-color: rgba(66, 133, 244, 0.1);
+}
