@@ -3,6 +3,9 @@ import json
 from datetime import datetime
 import os
 
+# Import the agent extensions
+from app.database.db_agent_extensions import DatabaseAgentExtensions
+
 class Database:
     def __init__(self, db_path="assistant.db"):
         self.db_path = db_path
@@ -458,3 +461,26 @@ class Database:
             return 0
         finally:
             conn.close()
+
+    async def get_all_tasks(self) -> List[Dict[str, Any]]:
+        """Get all tasks"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+        SELECT * FROM tasks ORDER BY execute_at
+        """)
+        
+        tasks = cursor.fetchall()
+        conn.close()
+        
+        # Convert to list of dicts
+        columns = [col[0] for col in cursor.description]
+        result = []
+        
+        for task_row in tasks:
+            task = dict(zip(columns, task_row))
+            task['recurring'] = bool(task['recurring'])
+            result.append(task)
+        
+        return result
