@@ -1,63 +1,48 @@
 /**
- * utils.js - Utility functions for the chat application
+ * Utility functions for the chat application
  */
 
-/**
- * Display debug messages in the console and optionally in the UI
- * @param {string} message - Debug message to display
- * @param {boolean} isError - Whether this is an error message
- */
-function showDebugMessage(message, isError = false) {
-    console.log(message);
-    // Optionally display in the UI for better visibility
-    const chatContainer = document.getElementById('chat-container');
-    if (!chatContainer) return;
+const Utils = {
+    /**
+     * Generate a random client ID
+     * @returns {string} A random string ID
+     */
+    generateClientId: function() {
+        return Math.random().toString(36).substring(2, 15);
+    },
     
-    const debugDiv = document.createElement('div');
-    debugDiv.className = `debug-message ${isError ? 'error' : 'info'}`;
-    debugDiv.textContent = `[Debug] ${message}`;
-    chatContainer.appendChild(debugDiv);
-}
-
-/**
- * Find an element by ID with error handling
- * @param {string} id - Element ID
- * @returns {HTMLElement|null} - The DOM element or null if not found
- */
-function getElement(id) {
-    const element = document.getElementById(id);
-    if (!element) {
-        showDebugMessage(`Element with ID '${id}' not found`, true);
+    /**
+     * Format a date for display
+     * @param {string} dateString - ISO format date string
+     * @returns {string} Formatted date string
+     */
+    formatDate: function(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleString();
+    },
+    
+    /**
+     * Truncate a string to a maximum length
+     * @param {string} str - The string to truncate
+     * @param {number} maxLength - Maximum length
+     * @returns {string} Truncated string
+     */
+    truncateString: function(str, maxLength = 30) {
+        if (str.length <= maxLength) return str;
+        return str.substring(0, maxLength) + '...';
+    },
+    
+    /**
+     * Escape HTML special characters to prevent XSS
+     * Note: This is a basic implementation. For production, consider using a library
+     * @param {string} str - The string to escape
+     * @returns {string} Escaped string
+     */
+    escapeHTML: function(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
     }
-    return element;
-}
-
-/**
- * Safely parse JSON with error handling
- * @param {string} jsonString - The JSON string to parse
- * @returns {object|null} - Parsed object or null on error
- */
-function safeJsonParse(jsonString) {
-    try {
-        return JSON.parse(jsonString);
-    } catch (error) {
-        showDebugMessage(`Error parsing JSON: ${error.message}`, true);
-        return null;
-    }
-}
-
-/**
- * Generate a unique ID for messages
- * @returns {string} - Unique ID
- */
-function generateId() {
-    return Date.now().toString();
-}
-
-// Export utilities for use in other modules
-window.chatUtils = {
-    showDebugMessage,
-    getElement,
-    safeJsonParse,
-    generateId
 };
+
+export default Utils;
