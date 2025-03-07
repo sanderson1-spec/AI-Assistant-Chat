@@ -106,6 +106,110 @@ class Database:
         
         return rows_affected > 0
     
+    async def delete_message(self, message_id):
+        """Delete a message and its responses from the database"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Begin transaction
+            cursor.execute("BEGIN TRANSACTION")
+            
+            # First get message info to determine if it's a user or assistant message
+            cursor.execute(
+                "SELECT role, conversation_id FROM messages WHERE id = ?", 
+                (message_id,)
+            )
+            message_info = cursor.fetchone()
+            
+            if not message_info:
+                # Message not found
+                cursor.execute("ROLLBACK")
+                return False
+                
+            role, conversation_id = message_info
+            
+            if role == 'user':
+                # If it's a user message, also delete all its responses
+                cursor.execute(
+                    "DELETE FROM messages WHERE parent_id = ?", 
+                    (message_id,)
+                )
+                
+            # Delete the message itself
+            cursor.execute(
+                "DELETE FROM messages WHERE id = ?", 
+                (message_id,)
+            )
+            
+            # Update conversation timestamp
+            cursor.execute(
+                "UPDATE conversations SET updated_at = ? WHERE conversation_id = ?",
+                (datetime.utcnow().isoformat(), conversation_id)
+            )
+            
+            # Commit the transaction
+            cursor.execute("COMMIT")
+            print(f"Message {message_id} deleted successfully")
+            return True
+        except Exception as e:
+            # Rollback in case of error
+            cursor.execute("ROLLBACK")
+            print(f"Error deleting message: {e}")
+            return False
+        finally:
+            conn.close()
+    
+    async def rewind_to_message(self, message_id):
+        """
+        Rewind conversation by deleting all messages after the specified message
+        Returns the conversation_id for the rewound conversation
+        """
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Begin transaction
+            cursor.execute("BEGIN TRANSACTION")
+            
+            # Get message info including timestamp and conversation
+            cursor.execute(
+                "SELECT timestamp, conversation_id FROM messages WHERE id = ?", 
+                (message_id,)
+            )
+            message_info = cursor.fetchone()
+            
+            if not message_info:
+                # Message not found
+                cursor.execute("ROLLBACK")
+                return None
+                
+            timestamp, conversation_id = message_info
+            
+            # Delete all later messages
+            cursor.execute("""
+            DELETE FROM messages 
+            WHERE conversation_id = ? AND timestamp > ?
+            """, (conversation_id, timestamp))
+            
+            # Update conversation timestamp
+            cursor.execute(
+                "UPDATE conversations SET updated_at = ? WHERE conversation_id = ?",
+                (datetime.utcnow().isoformat(), conversation_id)
+            )
+            
+            # Commit the transaction
+            cursor.execute("COMMIT")
+            print(f"Rewound conversation to message {message_id} (deleted all later messages)")
+            return conversation_id
+        except Exception as e:
+            # Rollback in case of error
+            cursor.execute("ROLLBACK")
+            print(f"Error rewinding conversation: {e}")
+            return None
+        finally:
+            conn.close()
+    
     async def store_response_version(self, user_id, content, parent_id, conversation_id, version=1, make_active=True):
         """Store a new version of a response"""
         # If making this the active version, deactivate all other versions for this parent

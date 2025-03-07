@@ -113,21 +113,31 @@ const MessageHandler = {
         }
         
         // Add action buttons based on role
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'message-actions';
+        
         if (data.role === 'user') {
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'message-actions';
-            
+            // User message actions
             const editButton = document.createElement('button');
             editButton.className = 'action-button';
             editButton.textContent = 'Edit';
             editButton.onclick = () => this.enterEditingMode(data.id, data.content);
             
-            actionsDiv.appendChild(editButton);
-            messageDiv.appendChild(actionsDiv);
-        } else if (data.role === 'assistant' && data.parent_id) {
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'message-actions';
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'action-button delete-action';
+            deleteButton.textContent = 'Delete';
+            deleteButton.onclick = () => this.deleteMessage(data.id);
             
+            const rewindButton = document.createElement('button');
+            rewindButton.className = 'action-button rewind-action';
+            rewindButton.textContent = 'Rewind';
+            rewindButton.onclick = () => this.rewindToMessage(data.id);
+            
+            actionsDiv.appendChild(editButton);
+            actionsDiv.appendChild(deleteButton);
+            actionsDiv.appendChild(rewindButton);
+        } else if (data.role === 'assistant' && data.parent_id) {
+            // Assistant message actions
             const regenerateButton = document.createElement('button');
             regenerateButton.className = 'action-button';
             regenerateButton.textContent = 'Regenerate';
@@ -138,8 +148,18 @@ const MessageHandler = {
             versionsButton.textContent = 'Versions';
             versionsButton.onclick = () => this.toggleVersionSelector(data.parent_id);
             
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'action-button delete-action';
+            deleteButton.textContent = 'Delete';
+            deleteButton.onclick = () => this.deleteMessage(data.id);
+            
             actionsDiv.appendChild(regenerateButton);
             actionsDiv.appendChild(versionsButton);
+            actionsDiv.appendChild(deleteButton);
+        }
+        
+        // Only add actions div if there are buttons
+        if (actionsDiv.children.length > 0) {
             messageDiv.appendChild(actionsDiv);
         }
         
@@ -522,6 +542,151 @@ const MessageHandler = {
                 throw new Error('Failed to select version');
             }
             return response.json();
+        });
+    },
+    
+    /**
+     * Delete a message and its responses
+     * @param {string|number} messageId - The message ID to delete
+     */
+    deleteMessage: function(messageId) {
+        // Confirm deletion
+        if (!confirm("Are you sure you want to delete this message? This cannot be undone.")) {
+            return;
+        }
+        
+        // Find the message element
+        const messageDiv = document.querySelector(`.message[data-message-id="${messageId}"]`);
+        if (!messageDiv) return;
+        
+        // If it's a user message, also find any response elements
+        const role = messageDiv.classList.contains('user-message') ? 'user' : 'assistant';
+        let responseElements = [];
+        
+        if (role === 'user') {
+            // Find all responses that have this message as parent
+            responseElements = document.querySelectorAll(`.message[data-parent-id="${messageId}"]`);
+        }
+        
+        // Show loading state
+        messageDiv.style.opacity = '0.5';
+        messageDiv.style.pointerEvents = 'none';
+        responseElements.forEach(el => {
+            el.style.opacity = '0.5';
+            el.style.pointerEvents = 'none';
+        });
+        
+        // Send delete request to server
+        fetch(`/api/messages/${messageId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message_id: messageId,
+                user_id: ConversationManager.getUserId()
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete message');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Remove the message elements from DOM
+            messageDiv.remove();
+            responseElements.forEach(el => el.remove());
+            
+            // Also remove from lastUserMessageId/lastResponseId if it was the last one
+            if (role === 'user' && this.lastUserMessageId == messageId) {
+                this.lastUserMessageId = null;
+            } else if (role === 'assistant' && this.lastResponseId == messageId) {
+                this.lastResponseId = null;
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting message:', error);
+            
+            // Restore elements
+            messageDiv.style.opacity = '1';
+            messageDiv.style.pointerEvents = 'auto';
+            responseElements.forEach(el => {
+                el.style.opacity = '1';
+                el.style.pointerEvents = 'auto';
+            });
+            
+            this.displaySystemMessage('Failed to delete message. Please try again.');
+        });
+    },
+    
+    /**
+     * Rewind conversation to a specific message by deleting all later messages
+     * @param {string|number} messageId - The message ID to rewind to
+     */
+    rewindToMessage: function(messageId) {
+        // Confirm rewind
+        if (!confirm("Rewind the conversation to this message? This will permanently delete all later messages.")) {
+            return;
+        }
+        
+        // Find the message element
+        const messageDiv = document.querySelector(`.message[data-message-id="${messageId}"]`);
+        if (!messageDiv) return;
+        
+        // Check if this is a temporary message ID (client-side only, not in database yet)
+        if (messageId.toString().startsWith('temp-')) {
+            this.displaySystemMessage('Cannot rewind to an unsaved message. Please wait for the message to be processed.');
+            return;
+        }
+        
+        // Show loading indicator
+        this.displaySystemMessage('Rewinding conversation...');
+        
+        // Send rewind request to server
+        fetch(`/api/messages/${messageId}/rewind`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message_id: messageId,
+                user_id: ConversationManager.getUserId()
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to rewind conversation: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // If successful, reload the conversation
+            UIController.clearChatMessages();
+            
+            // Reset message tracking
+            this.lastUserMessageId = null;
+            this.lastResponseId = null;
+            
+            // Add each message back to the UI
+            data.messages.forEach(message => {
+                const messageElement = this.createMessageElement(message);
+                UIController.addMessageToChat(messageElement);
+                
+                // Track messages for regeneration
+                if (message.role === 'user') {
+                    this.lastUserMessageId = message.id;
+                } else if (message.role === 'assistant') {
+                    this.lastResponseId = message.id;
+                }
+            });
+            
+            // Display success message
+            this.displaySystemMessage('Conversation rewound successfully');
+        })
+        .catch(error => {
+            console.error('Error rewinding conversation:', error);
+            this.displaySystemMessage('Failed to rewind conversation. Please try again.');
         });
     },
     

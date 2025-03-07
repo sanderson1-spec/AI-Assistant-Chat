@@ -28,6 +28,14 @@ class VersionSelectRequest(BaseModel):
     conversation_id: str
     user_id: str = "default_user"
 
+class DeleteMessageRequest(BaseModel):
+    message_id: int
+    user_id: str = "default_user"
+
+class RewindRequest(BaseModel):
+    message_id: int
+    user_id: str = "default_user"
+
 # Create FastAPI app
 app = FastAPI(title="AI Assistant")
 
@@ -146,6 +154,68 @@ async def select_version(request: VersionSelectRequest):
         return {"status": "success", "message": "Version activated successfully"}
     else:
         raise HTTPException(status_code=500, detail="Failed to set active version")
+
+@app.delete("/api/messages/{message_id}")
+async def delete_message(message_id: int, request: DeleteMessageRequest = Body(...)):
+    """Delete a specific message and its responses"""
+    success = await db.delete_message(message_id)
+    if success:
+        return {"status": "success", "message": "Message deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Message not found or could not be deleted")
+
+@app.post("/api/messages/{message_id}/rewind")
+async def rewind_to_message(message_id: int, request: RewindRequest = Body(...)):
+    """Rewind the conversation to a specific message by deleting all later messages"""
+    try:
+        # Ensure message_id is a valid integer
+        if isinstance(message_id, str) and message_id.startswith('temp-'):
+            raise HTTPException(
+                status_code=400, 
+                detail="Cannot rewind to a temporary message ID. Wait for the message to be saved."
+            )
+        
+        # Convert to integer if it's a string that looks like a number
+        if isinstance(message_id, str):
+            try:
+                message_id = int(message_id)
+            except ValueError:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Invalid message ID format: {message_id}. Expected an integer."
+                )
+        
+        # Now attempt to rewind
+        conversation_id = await db.rewind_to_message(message_id)
+        if conversation_id:
+            # Get the updated conversation
+            messages = await db.get_conversation_history(conversation_id)
+            return {
+                "status": "success", 
+                "message": "Conversation rewound successfully",
+                "conversation_id": conversation_id,
+                "messages": messages
+            }
+        else:
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Message with ID {message_id} not found or could not rewind conversation"
+            )
+    except Exception as e:
+        # Log the error for debugging
+        import traceback
+        print(f"Error in rewind_to_message: {str(e)}")
+        print(traceback.format_exc())
+        
+        # If it's already an HTTPException, re-raise it
+        if isinstance(e, HTTPException):
+            raise e
+            
+        # Otherwise, wrap it in a 500 error
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Server error while rewinding conversation: {str(e)}"
+        )
 
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str):
