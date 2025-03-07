@@ -34,11 +34,23 @@ const ConversationManager = {
     },
     
     /**
+     * Get the user ID
+     * @returns {string} The user ID
+     */
+    getUserId: function() {
+        return this.userId;
+    },
+    
+    /**
      * Start a new conversation
      */
     newConversation: function() {
         this.currentConversationId = null;
         UIController.clearChatMessages();
+        
+        // Reset message tracking for regeneration
+        MessageHandler.lastUserMessageId = null;
+        MessageHandler.lastResponseId = null;
     },
     
     /**
@@ -71,9 +83,20 @@ const ConversationManager = {
             const data = await response.json();
             
             UIController.clearChatMessages();
+            MessageHandler.lastUserMessageId = null;
+            MessageHandler.lastResponseId = null;
             
             data.messages.forEach(message => {
-                MessageHandler.displayMessage(message.content, message.role);
+                // Add full message objects with IDs and metadata
+                const messageElement = MessageHandler.createMessageElement(message);
+                UIController.addMessageToChat(messageElement);
+                
+                // Track the last user message for regeneration
+                if (message.role === 'user') {
+                    MessageHandler.lastUserMessageId = message.id;
+                } else if (message.role === 'assistant') {
+                    MessageHandler.lastResponseId = message.id;
+                }
             });
         } catch (error) {
             console.error('Error loading conversation:', error);
@@ -103,6 +126,8 @@ const ConversationManager = {
                 if (this.currentConversationId === conversationId) {
                     this.currentConversationId = null;
                     UIController.clearChatMessages();
+                    MessageHandler.lastUserMessageId = null;
+                    MessageHandler.lastResponseId = null;
                 }
                 
                 // Reload the conversations list
@@ -132,6 +157,8 @@ const ConversationManager = {
                 // Clear current chat
                 this.currentConversationId = null;
                 UIController.clearChatMessages();
+                MessageHandler.lastUserMessageId = null;
+                MessageHandler.lastResponseId = null;
                 
                 // Reload conversations list (should be empty)
                 this.loadConversations();

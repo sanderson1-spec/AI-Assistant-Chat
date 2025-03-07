@@ -3,6 +3,8 @@
  */
 
 const UIController = {
+    currentEditTextarea: null,
+    
     /**
      * Add a message element to the chat container
      * @param {HTMLElement} messageElement - The message element to add
@@ -33,6 +35,72 @@ const UIController = {
      */
     clearMessageInput: function() {
         document.getElementById('message-input').value = '';
+        document.getElementById('message-input').focus();
+    },
+    
+    /**
+     * Set the input focus to a specific textarea during editing
+     * @param {HTMLTextAreaElement|null} textarea - The textarea to focus
+     */
+    setCurrentEditTextarea: function(textarea) {
+        this.currentEditTextarea = textarea;
+    },
+    
+    /**
+     * Get the currently active textarea (message input or edit textarea)
+     * @returns {HTMLElement|null} The active textarea
+     */
+    getCurrentTextInput: function() {
+        return this.currentEditTextarea || document.getElementById('message-input');
+    },
+    
+    /**
+     * Set the message input to a textarea for multiline support
+     */
+    setupTextareaInput: function() {
+        // Replace the input field with a textarea
+        const inputContainer = document.querySelector('.input-container');
+        const oldInput = document.getElementById('message-input');
+        
+        if (oldInput && oldInput.tagName !== 'TEXTAREA') {
+            const currentValue = oldInput.value;
+            
+            // Create a new textarea
+            const textarea = document.createElement('textarea');
+            textarea.id = 'message-input';
+            textarea.placeholder = "Type your message here...";
+            textarea.value = currentValue;
+            textarea.classList.add('message-textarea');
+            
+            // Replace the input with the textarea
+            inputContainer.replaceChild(textarea, oldInput);
+            
+            // Add event listener for Shift+Enter
+            textarea.addEventListener('keydown', (event) => {
+                // Only Enter without shift sends the message
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    document.getElementById('send-button').click();
+                }
+            });
+        }
+    },
+    
+    /**
+     * Add keyboard shortcut info to the UI
+     */
+    addKeyboardShortcutInfo: function() {
+        const inputContainer = document.querySelector('.input-container');
+        
+        // Check if info already exists
+        if (!document.querySelector('.key-binding-info')) {
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'key-binding-info';
+            infoDiv.textContent = 'Press Enter to send. Shift+Enter for new line. Cmd+R to regenerate last response.';
+            
+            // Add after the input container
+            inputContainer.parentNode.insertBefore(infoDiv, inputContainer.nextSibling);
+        }
     },
     
     /**

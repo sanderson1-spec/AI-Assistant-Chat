@@ -24,8 +24,11 @@
         <div class="main">
             <div class="chat-container" id="chat-container"></div>
             <div class="input-container">
-                <input type="text" id="message-input" placeholder="Type your message here...">
+                <textarea id="message-input" placeholder="Type your message here..."></textarea>
                 <button id="send-button">Send</button>
+            </div>
+            <div class="key-binding-info">
+                Press Enter to send. Shift+Enter for new line. Cmd+R to regenerate last response.
             </div>
         </div>
     </div>
@@ -42,19 +45,26 @@
                 const sendButton = document.getElementById('send-button');
                 const messageInput = document.getElementById('message-input');
                 
-                sendButton.addEventListener('click', function() {
-                    console.log('Fallback send button handler');
-                    const message = messageInput.value.trim();
-                    if (message) {
-                        const chatContainer = document.getElementById('chat-container');
-                        const messageDiv = document.createElement('div');
-                        messageDiv.className = 'message user-message';
-                        messageDiv.textContent = message;
-                        chatContainer.appendChild(messageDiv);
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                        messageInput.value = '';
-                    }
-                });
+                if (sendButton && !sendButton._hasEventListener) {
+                    console.warn('Fallback script activated - module loading might have failed');
+                    
+                    sendButton.addEventListener('click', function() {
+                        console.log('Fallback send button handler');
+                        const message = messageInput.value.trim();
+                        if (message) {
+                            const chatContainer = document.getElementById('chat-container');
+                            const messageDiv = document.createElement('div');
+                            messageDiv.className = 'message user-message';
+                            messageDiv.textContent = message;
+                            chatContainer.appendChild(messageDiv);
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                            messageInput.value = '';
+                        }
+                    });
+                    
+                    // Mark the button to avoid adding multiple listeners
+                    sendButton._hasEventListener = true;
+                }
             }, 2000); // Wait 2 seconds for the modules to load
         });
     </script>

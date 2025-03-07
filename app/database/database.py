@@ -19,32 +19,22 @@ class Database:
         conn = self.get_connection()
         cursor = conn.cursor()
         
-        # Check if the messages table already exists
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='messages'")
-        table_exists = cursor.fetchone() is not None
-        
-        if not table_exists:
-            # Create the messages table with the message_id column
-            cursor.execute("""
-            CREATE TABLE IF NOT EXISTS messages (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                message_id TEXT,
-                user_id TEXT NOT NULL,
-                timestamp TEXT NOT NULL,
-                content TEXT NOT NULL,
-                role TEXT NOT NULL,
-                conversation_id TEXT NOT NULL,
-                metadata TEXT
-            )
-            """)
-        else:
-            # Check if the message_id column exists, add it if it doesn't
-            cursor.execute("PRAGMA table_info(messages)")
-            columns = [info[1] for info in cursor.fetchall()]
-            
-            if "message_id" not in columns:
-                print("Adding message_id column to messages table...")
-                cursor.execute("ALTER TABLE messages ADD COLUMN message_id TEXT")
+        # Messages table with support for edited messages and versions
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            content TEXT NOT NULL,
+            role TEXT NOT NULL,
+            conversation_id TEXT NOT NULL,
+            parent_id INTEGER,
+            is_edited INTEGER DEFAULT 0,
+            version INTEGER DEFAULT 1,
+            is_active_version INTEGER DEFAULT 1,
+            metadata TEXT
+        )
+        """)
         
         # Conversations table for metadata
         cursor.execute("""
@@ -61,10 +51,9 @@ class Database:
         conn.close()
         print("Database initialized successfully")
     
-    async def store_message(self, user_id, content, role, conversation_id=None, metadata=None):
+    async def store_message(self, user_id, content, role, conversation_id=None, parent_id=None, version=1, metadata=None):
         """Store a message in the database"""
         timestamp = datetime.utcnow().isoformat()
-        message_id = f"msg_{timestamp}_{user_id}"
         
         # Generate a conversation ID if not provided
         if conversation_id is None:
@@ -81,23 +70,126 @@ class Database:
         
         cursor.execute("""
         INSERT INTO messages 
-        (message_id, user_id, timestamp, content, role, conversation_id, metadata) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        (user_id, timestamp, content, role, conversation_id, parent_id, version, metadata) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            message_id,
             user_id, 
             timestamp, 
             content, 
             role, 
             conversation_id,
+            parent_id,
+            version,
             json.dumps(metadata) if metadata else None
         ))
         
-        db_id = cursor.lastrowid
+        message_id = cursor.lastrowid
         conn.commit()
         conn.close()
         
-        return db_id, conversation_id, message_id
+        return message_id, conversation_id
+    
+    async def edit_message(self, message_id, new_content):
+        """Edit an existing message and mark it as edited"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+        UPDATE messages
+        SET content = ?, is_edited = 1
+        WHERE id = ?
+        """, (new_content, message_id))
+        
+        rows_affected = cursor.rowcount
+        conn.commit()
+        conn.close()
+        
+        return rows_affected > 0
+    
+    async def store_response_version(self, user_id, content, parent_id, conversation_id, version=1, make_active=True):
+        """Store a new version of a response"""
+        # If making this the active version, deactivate all other versions for this parent
+        if make_active:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+            UPDATE messages
+            SET is_active_version = 0
+            WHERE parent_id = ? AND role = 'assistant'
+            """, (parent_id,))
+            
+            conn.commit()
+            conn.close()
+        
+        # Store the new response version
+        message_id, _ = await self.store_message(
+            user_id=user_id,
+            content=content,
+            role="assistant",
+            conversation_id=conversation_id,
+            parent_id=parent_id,
+            version=version
+        )
+        
+        return message_id
+    
+    async def get_response_versions(self, parent_id):
+        """Get all response versions for a specific user message"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+        SELECT id, content, version, is_active_version, timestamp
+        FROM messages
+        WHERE parent_id = ? AND role = 'assistant'
+        ORDER BY version ASC
+        """, (parent_id,))
+        
+        versions = cursor.fetchall()
+        conn.close()
+        
+        return [{
+            "id": row[0],
+            "content": row[1],
+            "version": row[2],
+            "is_active": bool(row[3]),
+            "timestamp": row[4]
+        } for row in versions]
+    
+    async def set_active_response_version(self, message_id, parent_id):
+        """Set a specific response version as the active one"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Begin transaction
+            cursor.execute("BEGIN TRANSACTION")
+            
+            # Deactivate all versions for this parent
+            cursor.execute("""
+            UPDATE messages
+            SET is_active_version = 0
+            WHERE parent_id = ? AND role = 'assistant'
+            """, (parent_id,))
+            
+            # Activate the specified version
+            cursor.execute("""
+            UPDATE messages
+            SET is_active_version = 1
+            WHERE id = ?
+            """, (message_id,))
+            
+            # Commit the transaction
+            cursor.execute("COMMIT")
+            return True
+        except Exception as e:
+            # Rollback in case of error
+            cursor.execute("ROLLBACK")
+            print(f"Error setting active version: {e}")
+            return False
+        finally:
+            conn.close()
     
     async def create_conversation(self, conversation_id, user_id, title=None):
         """Create a new conversation"""
@@ -142,11 +234,12 @@ class Database:
         conn = self.get_connection()
         cursor = conn.cursor()
         
+        # Get all messages but filter out inactive response versions
         cursor.execute("""
-        SELECT id, message_id, user_id, timestamp, content, role, metadata
-        FROM messages
-        WHERE conversation_id = ?
-        ORDER BY timestamp ASC
+        SELECT m.id, m.user_id, m.timestamp, m.content, m.role, m.parent_id, m.is_edited, m.version, m.metadata
+        FROM messages m
+        WHERE m.conversation_id = ? AND (m.role != 'assistant' OR m.is_active_version = 1)
+        ORDER BY m.timestamp ASC
         LIMIT ?
         """, (conversation_id, limit))
         
@@ -155,12 +248,14 @@ class Database:
         
         return [{
             "id": row[0],
-            "message_id": row[1],
-            "user_id": row[2],
-            "timestamp": row[3],
-            "content": row[4],
-            "role": row[5],
-            "metadata": json.loads(row[6]) if row[6] else None
+            "user_id": row[1],
+            "timestamp": row[2],
+            "content": row[3],
+            "role": row[4],
+            "parent_id": row[5],
+            "is_edited": bool(row[6]),
+            "version": row[7],
+            "metadata": json.loads(row[8]) if row[8] else None
         } for row in messages]
     
     async def get_recent_conversations(self, user_id, limit=10):

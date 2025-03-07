@@ -11,11 +11,17 @@ const MessageFormatter = {
     parseMarkdown: function(text) {
         if (!text) return '';
         
+        // Escape HTML first to prevent XSS
+        let formattedText = this.escapeHTML(text);
+        
         // Replace *text* with <em>text</em> for italics
-        // The regex looks for text between asterisks, but not if the asterisk is:
-        // - preceded by a backslash (escaped)
-        // - part of a word (no space before/after)
-        let formattedText = text.replace(/(?<!\\\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+        formattedText = formattedText.replace(/(?<!\\\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+        
+        // Replace **text** with <strong>text</strong> for bold
+        formattedText = formattedText.replace(/(?<!\\\*)\*\*([^*]+)\*\*(?!\*)/g, '<strong>$1</strong>');
+        
+        // Replace `code` with <code>code</code> for inline code
+        formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
         
         // Replace line breaks with <br> tags
         formattedText = formattedText.replace(/\n/g, '<br>');
@@ -24,19 +30,26 @@ const MessageFormatter = {
     },
     
     /**
-     * Format a message for display in the chat
-     * @param {string} content - The message content
-     * @param {string} role - The role (user/assistant)
-     * @returns {HTMLElement} The formatted message element
+     * Escape HTML special characters to prevent XSS
+     * @param {string} str - The string to escape
+     * @returns {string} Escaped string
      */
-    formatMessage: function(content, role) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${role}-message`;
+    escapeHTML: function(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    },
+    
+    /**
+     * Format a string as plain text (no markdown)
+     * @param {string} text - The text to format
+     * @returns {string} Formatted text
+     */
+    formatPlainText: function(text) {
+        if (!text) return '';
         
-        // Apply markdown parsing and set as HTML
-        messageDiv.innerHTML = this.parseMarkdown(content);
-        
-        return messageDiv;
+        // Escape HTML and replace line breaks
+        return this.escapeHTML(text).replace(/\n/g, '<br>');
     }
 };
 

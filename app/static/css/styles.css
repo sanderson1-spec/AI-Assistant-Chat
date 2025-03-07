@@ -43,6 +43,9 @@ body, html {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    resize: vertical;
+    min-height: 40px;
+    max-height: 150px;
 }
 
 #send-button {
@@ -86,6 +89,7 @@ body, html {
     margin-bottom: 15px;
     border-radius: 8px;
     line-height: 1.5;
+    position: relative;
 }
 
 .message p {
@@ -106,6 +110,14 @@ body, html {
     background-color: #f5f5f5;
     margin-right: auto;
     border-bottom-left-radius: 0;
+}
+
+.system-message {
+    background-color: #fff4e5;
+    margin: 10px auto;
+    text-align: center;
+    font-style: italic;
+    max-width: 90%;
 }
 
 .new-chat-button {
@@ -151,4 +163,124 @@ body, html {
 .message em {
     font-style: italic;
     color: inherit;
+}
+
+/* Message action buttons */
+.message-actions {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    display: none;
+}
+
+.message:hover .message-actions {
+    display: block;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    margin-left: 5px;
+    font-size: 12px;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.action-button:hover {
+    color: #4285f4;
+    background-color: rgba(66, 133, 244, 0.1);
+}
+
+/* Editing mode */
+.message.editing {
+    border: 2px dashed #4285f4;
+}
+
+.edit-textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    resize: vertical;
+    min-height: 40px;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.edit-actions button {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.edit-actions button:first-child {
+    background-color: #4285f4;
+    color: white;
+}
+
+.edit-actions button:last-child {
+    background-color: #f1f1f1;
+    color: #666;
+}
+
+/* Version selector */
+.version-selector {
+    display: flex;
+    margin-top: 0;
+    margin-bottom: 8px;
+    padding: 5px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    font-size: 12px;
+    align-items: center;
+}
+
+.version-button {
+    margin-right: 5px;
+    padding: 2px 6px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+.version-button:hover {
+    background-color: #e6e6e6;
+}
+
+.version-button.active {
+    background-color: #4285f4;
+    color: white;
+    border-color: #4285f4;
+}
+
+.edited-indicator {
+    font-size: 10px;
+    color: #999;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* Key binding info */
+.key-binding-info {
+    font-size: 11px;
+    color: #777;
+    text-align: center;
+    padding: 5px 0;
+    border-top: 1px solid #eee;
+    margin-top: 5px;
+}
+
+/* Make sure the message content is properly styled */
+.message-content {
+    word-break: break-word;
+    hyphens: auto;
 }
