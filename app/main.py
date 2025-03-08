@@ -27,6 +27,7 @@ logging.basicConfig(
 from app.database.database import Database
 from app.llm.lmstudio_client import LMStudioClient
 from app.config import CONFIG, DEBUG, logger
+from app.personality.personality_manager import PersonalityManager
 
 # Import AI Agents components
 from app.bots.bot_framework import BotRegistry, BaseBot, BotCapability
@@ -82,10 +83,13 @@ os.makedirs("data", exist_ok=True)
 # Initialize database
 db = Database(db_path=CONFIG["database"]["path"])
 
-# Initialize LMStudio client
+# Initialize personality manager
+personality_manager = PersonalityManager()
+
+# Initialize LMStudio client with personality
 lmstudio_url = CONFIG["lmstudio"]["url"]
-llm_client = LMStudioClient(base_url=lmstudio_url)
-logger.info(f"Connecting to LMStudio at: {lmstudio_url}")
+llm_client = LMStudioClient(base_url=lmstudio_url, personality_manager=personality_manager)
+print(f"Connecting to LMStudio at: {lmstudio_url}")
 
 # Initialize the Enhanced WebSocket connection manager
 manager = EnhancedConnectionManager()
@@ -174,6 +178,66 @@ def shutdown_event():
 @app.get("/", response_class=HTMLResponse)
 async def get_home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/settings", response_class=HTMLResponse)
+async def get_settings(request: Request):
+    return templates.TemplateResponse("settings.html", {"request": request})
+
+@app.get("/api/settings/personality")
+async def get_personality_settings():
+    """Get current personality settings"""
+    return personality_manager.traits
+
+@app.get("/api/settings/personalities")
+async def get_available_personalities():
+    """Get list of available personality presets"""
+    return personality_manager.get_available_personalities()
+
+@app.get("/api/settings/personality/{name}")
+async def get_personality(name: str):
+    """Get a specific personality by name"""
+    try:
+        return personality_manager.load_personality(name)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Personality not found: {name}")
+
+@app.post("/api/settings/personality")
+async def update_personality_settings(settings: Dict[str, Any]):
+    """Update personality settings"""
+    try:
+        personality_manager.save_personality(settings)
+        return {"status": "success", "message": "Settings updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/settings/personalities/new")
+async def create_new_personality(personality: Dict[str, Any]):
+    """Create a new personality preset"""
+    try:
+        name = personality.get("name")
+        if not name:
+            raise HTTPException(status_code=400, detail="Personality name is required")
+        
+        # Save as new personality file
+        personality_manager.save_personality(personality, f"{name}.json")
+        return {"status": "success", "message": f"Created new personality: {name}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/settings/personalities/{name}")
+async def delete_personality(name: str):
+    """Delete a personality preset"""
+    try:
+        if name == "default":
+            raise HTTPException(status_code=400, detail="Cannot delete default personality")
+        
+        success = personality_manager.delete_personality(f"{name}.json")
+        if success:
+            return {"status": "success", "message": f"Deleted personality: {name}"}
+        else:
+            raise HTTPException(status_code=404, detail=f"Personality not found: {name}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Existing conversation API routes
 @app.get("/api/conversations")

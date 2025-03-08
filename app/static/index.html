@@ -19,6 +19,7 @@
     <div class="app-container">
         <div class="sidebar">
             <button class="new-chat-button" id="new-chat-button">New Chat</button>
+            <button class="settings-button" id="settings-button" onclick="window.location.href='/settings'">Settings</button>
             <div id="conversations-list"></div>
         </div>
         <div class="main">
@@ -33,18 +34,6 @@
         </div>
     </div>
 
-    <!-- Load NotificationHandler first to ensure it's available -->
-    <!-- <script type="module">
-        import NotificationHandler from '/static/js/notification-handler.js';
-        // Make NotificationHandler globally available
-        window.NotificationHandler = NotificationHandler;
-        
-        // Initialize when document is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Initializing NotificationHandler from loader script');
-            NotificationHandler.init();
-        });
-    </script> -->
 
     <!-- Import notification checker for diagnostics -->
     <script type="module" src="/static/js/notification-checker.js"></script>

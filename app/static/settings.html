@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant Settings</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        .settings-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .settings-section {
+            margin-bottom: 30px;
+        }
+        
+        .settings-section h2 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .setting-item {
+            margin-bottom: 20px;
+        }
+        
+        .setting-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .setting-item input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .setting-item .range-value {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .setting-item select,
+        .setting-item input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .button-group {
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        .button-group button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .save-button {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .cancel-button {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .expertise-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .expertise-tag {
+            background: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .expertise-tag button {
+            background: none;
+            border: none;
+            margin-left: 5px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .action-button {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .warning {
+            background: #f44336;
+        }
+        
+        .action-button:hover {
+            opacity: 0.9;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <h1>AI Assistant Settings</h1>
+        
+        <div class="settings-section">
+            <h2>Personality Management</h2>
+            <div class="setting-item">
+                <label for="personality-select">Select Personality</label>
+                <select id="personality-select">
+                    <!-- Personalities will be loaded dynamically -->
+                </select>
+            </div>
+            <div class="setting-item">
+                <button id="new-personality-btn" class="action-button">Create New Personality</button>
+                <button id="delete-personality-btn" class="action-button warning" style="display: none;">Delete Current Personality</button>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <h2>Basic Information</h2>
+            <div class="setting-item">
+                <label for="assistant-name">Assistant Name</label>
+                <input type="text" id="assistant-name" placeholder="AI Assistant">
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <h2>Personality Traits</h2>
+            <div class="setting-item">
+                <label for="friendliness">Friendliness</label>
+                <input type="range" id="friendliness" min="0" max="1" step="0.1">
+                <span class="range-value" id="friendliness-value">0.8</span>
+            </div>
+            <div class="setting-item">
+                <label for="formality">Formality</label>
+                <input type="range" id="formality" min="0" max="1" step="0.1">
+                <span class="range-value" id="formality-value">0.6</span>
+            </div>
+            <div class="setting-item">
+                <label for="helpfulness">Helpfulness</label>
+                <input type="range" id="helpfulness" min="0" max="1" step="0.1">
+                <span class="range-value" id="helpfulness-value">0.9</span>
+            </div>
+            <div class="setting-item">
+                <label for="creativity">Creativity</label>
+                <input type="range" id="creativity" min="0" max="1" step="0.1">
+                <span class="range-value" id="creativity-value">0.7</span>
+            </div>
+            <div class="setting-item">
+                <label for="humor">Humor</label>
+                <input type="range" id="humor" min="0" max="1" step="0.1">
+                <span class="range-value" id="humor-value">0.5</span>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <h2>Communication Style</h2>
+            <div class="setting-item">
+                <label for="tone">Tone</label>
+                <select id="tone">
+                    <option value="friendly and professional">Friendly and Professional</option>
+                    <option value="formal">Formal</option>
+                    <option value="casual">Casual</option>
+                    <option value="technical">Technical</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label for="language-complexity">Language Complexity</label>
+                <select id="language-complexity">
+                    <option value="simple">Simple</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label>
+                    <input type="checkbox" id="use-emojis"> Use Emojis
+                </label>
+            </div>
+            <div class="setting-item" id="emoji-frequency-container" style="display: none;">
+                <label for="emoji-frequency">Emoji Frequency</label>
+                <input type="range" id="emoji-frequency" min="0" max="1" step="0.1">
+                <span class="range-value" id="emoji-frequency-value">0.3</span>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <h2>Expertise Areas</h2>
+            <div class="setting-item">
+                <label for="new-expertise">Add Expertise Area</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="new-expertise" placeholder="Enter expertise area">
+                    <button onclick="addExpertise()" style="padding: 8px 15px;">Add</button>
+                </div>
+                <div class="expertise-tags" id="expertise-tags">
+                    <!-- Tags will be added here dynamically -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="cancel-button" onclick="window.location.href='/'">Cancel</button>
+            <button class="save-button" onclick="saveSettings()">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- Modal for creating new personality -->
+    <div id="new-personality-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create New Personality</h2>
+            <div class="setting-item">
+                <label for="new-personality-name">Name</label>
+                <input type="text" id="new-personality-name" placeholder="Enter personality name">
+            </div>
+            <div class="button-group">
+                <button class="cancel-button" onclick="closeNewPersonalityModal()">Cancel</button>
+                <button class="save-button" onclick="createNewPersonality()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/settings.js"></script>
+</body>
+</html> 

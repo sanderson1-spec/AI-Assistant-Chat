@@ -5,7 +5,7 @@ Orchestrates communication between user and specialized bots
 import logging
 import uuid
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 
 class CentralController:
@@ -16,7 +16,7 @@ class CentralController:
         self.bot_registry = bot_registry
         self.task_scheduler = task_scheduler
         self.notification_service = notification_service
-        self.llm_client = llm_client  # Optional LLM client for intent analysis
+        self.llm_client = llm_client  # LLM client for general conversation
         self.logger = logging.getLogger("ai-assistant.central-controller")
     
     async def process_message(self, user_id: str, message: str, conversation_id: Optional[str] = None):
@@ -53,15 +53,63 @@ class CentralController:
         # Get conversation context
         context = await self.get_conversation_context(conversation_id)
         
-        # Analyze intent to determine which bots should process the message
-        capabilities = await self.analyze_message_intent(message, context)
-        self.logger.info(f"Detected capabilities: {capabilities}")
+        # Attempt to analyze intent and identify capabilities
+        try:
+            if self.llm_client and hasattr(self.llm_client, 'analyze_intent'):
+                capabilities = await self.llm_client.analyze_intent(message, context)
+            else:
+                capabilities = await self.analyze_message_intent(message, context)
+        except Exception as e:
+            self.logger.error(f"Error analyzing intent: {str(e)}")
+            capabilities = ['assistant']
         
-        # Debug available bots
-        all_bots = self.bot_registry.get_all_bots()
-        self.logger.info(f"Available bots: {[bot.id for bot in all_bots]}")
-        for bot in all_bots:
-            self.logger.info(f"Bot {bot.id} capabilities: {[cap.name for cap in bot.capabilities]}")
+        # If no specific capabilities detected or only general assistant, use LLM
+        if not capabilities or capabilities == ['assistant']:
+            try:
+                # Prepare message for LLM
+                llm_messages = [
+                    {"role": "user", "content": message}
+                ]
+                
+                # Generate response from LLM with full context
+                response = await self.llm_client.generate_response(llm_messages, context)
+                
+                # Store assistant response
+                response_id, _ = await self.database.store_message(
+                    user_id=user_id,
+                    content=response,
+                    role="assistant",
+                    conversation_id=conversation_id,
+                    parent_id=message_id
+                )
+                
+                return {
+                    "response": response,
+                    "conversation_id": conversation_id,
+                    "message_id": response_id,
+                    "parent_id": message_id
+                }
+            except Exception as e:
+                self.logger.error(f"Error using LLM for general conversation: {str(e)}", exc_info=True)
+                
+                # Fallback response if LLM fails
+                fallback_response = "I'm having trouble understanding at the moment. Could you rephrase that?"
+                
+                # Store fallback response
+                response_id, _ = await self.database.store_message(
+                    user_id=user_id,
+                    content=fallback_response,
+                    role="assistant",
+                    conversation_id=conversation_id,
+                    parent_id=message_id
+                )
+                
+                return {
+                    "response": fallback_response,
+                    "conversation_id": conversation_id,
+                    "message_id": response_id,
+                    "parent_id": message_id
+                }
         
         # Collect responses from appropriate bots
         bot_responses = []
@@ -72,7 +120,6 @@ class CentralController:
         for capability in capabilities:
             # Get bots that can handle this capability
             bots = self.bot_registry.get_bots_for_capability(capability)
-            self.logger.info(f"Bots for capability '{capability}': {[bot.id for bot in bots]}")
             
             # Skip if no bots can handle this capability
             if not bots:
@@ -117,16 +164,7 @@ class CentralController:
                 self.logger.error(f"Error processing message with bot {bot.id}: {str(e)}", exc_info=True)
                 # Don't let one bot failure prevent others from processing
         
-        # If no bot could handle the message, use fallback response
-        if not bot_responses:
-            self.logger.warning("No bot responses generated, using fallback")
-            bot_responses.append({
-                "bot_id": "central_controller",
-                "bot_name": "Assistant",
-                "response": "I'm not sure how to help with that. Could you please rephrase your request?"
-            })
-        
-        # Combine responses from all bots
+        # Combine responses from bots
         combined_response = self.combine_responses(bot_responses)
         
         # Store assistant response
@@ -181,81 +219,89 @@ class CentralController:
             "parent_id": message_id
         }
     
-    async def analyze_message_intent(self, message: str, context: Dict[str, Any]) -> List[str]:
+    async def get_conversation_context(self, conversation_id: str) -> Dict[str, Any]:
         """
-        Analyze message to determine capabilities needed to respond
+        Get context for a conversation, including system time information
         
         Args:
-            message: Text message from the user
-            context: Conversation context
-            
-        Returns:
-            List of capability names that might handle this message
-        """
-        # Attempt to use LLM for intent detection if available
-        if self.llm_client and hasattr(self.llm_client, "analyze_intent"):
-            try:
-                capabilities = await self.llm_client.analyze_intent(message, context)
-                if capabilities:
-                    self.logger.info(f"LLM detected intents: {capabilities}")
-                    return capabilities
-            except Exception as e:
-                self.logger.error(f"Error using LLM for intent analysis: {str(e)}")
+            conversation_id: ID of the current conversation
         
-        # Fallback to keyword-based approach
+        Returns:
+            A dictionary with conversation context and current time information
+        """
+        # Get current date and time information
+        now = datetime.now().astimezone()  # Get timezone-aware current time
+        
+        # Generate time-related context
+        time_context = {
+            "current_datetime": now.isoformat(),
+            "current_date": now.date().isoformat(),
+            "current_time": now.time().isoformat(),
+            "current_day_of_week": now.strftime("%A"),
+            "tomorrow_date": (now + timedelta(days=1)).date().isoformat(),
+            "tomorrow_day_of_week": (now + timedelta(days=1)).strftime("%A"),
+            "next_week_start": (now + timedelta(days=7-now.weekday())).date().isoformat(),
+            "timezone": str(now.tzinfo)
+        }
+        
+        # Get recent messages
+        messages = await self.database.get_conversation_history(conversation_id, limit=10)
+        
+        # Get any stored context for this conversation
+        stored_context = await self.database.get_conversation_context(conversation_id)
+        
+        # Combine into a complete context object
+        context = {
+            "messages": messages,
+            "conversation_id": conversation_id,
+            "timestamp": now.isoformat(),
+            "time_context": time_context,
+            **stored_context
+        }
+        
+        return context
+    
+    async def analyze_message_intent(self, message: str, context: Dict[str, Any]) -> List[str]:
+        """
+        Fallback method to analyze message intent using keywords
+        """
+        # Fallback to a simple keyword-based approach
         capabilities = set()
         message_lower = message.lower()
         
-        # Check for time-related keywords (reminder bot)
-        if any(keyword in message_lower for keyword in [
-            "remind", "reminder", "schedule", "timer", "alarm", "in 5 minutes", 
-            "tomorrow", "later", "notification", "alert me", "notify"
-        ]):
-            capabilities.add("reminders")
+        # Define keyword mappings for different capabilities
+        capability_keywords = {
+            "reminders": [
+                "remind", "reminder", "schedule", "timer", "alarm", 
+                "notify", "notification", "alert", "deadline"
+            ],
+            "todos": [
+                "todo", "task", "to-do", "checklist", 
+                "list", "add item", "mark complete", "finish task"
+            ],
+            "calendar": [
+                "meeting", "appointment", "schedule", "event", 
+                "book", "reservation", "availability", "date"
+            ],
+            "email": [
+                "email", "mail", "send message", "draft", "compose"
+            ],
+            "search": [
+                "find", "search", "lookup", "information about", 
+                "tell me about", "what is", "who is"
+            ]
+        }
         
-        # Check for todo-related keywords
-        if any(keyword in message_lower for keyword in [
-            "todo", "task", "list", "add item", "mark complete", "finish",
-            "to-do", "to do", "checklist", "complete", "add a task"
-        ]):
-            capabilities.add("todos")
+        # Check for keywords in the message
+        for capability, keywords in capability_keywords.items():
+            if any(keyword in message_lower for keyword in keywords):
+                capabilities.add(capability)
+                self.logger.info(f"Found keywords for capability: {capability}")
         
-        # Check for calendar-related keywords
-        if any(keyword in message_lower for keyword in [
-            "calendar", "meeting", "appointment", "schedule", "event",
-            "book", "reservation", "availability"
-        ]):
-            capabilities.add("calendar")
-        
-        # Check for email-related keywords
-        if any(keyword in message_lower for keyword in [
-            "email", "mail", "send", "draft", "compose", "write"
-        ]):
-            capabilities.add("email")
-        
-        # Check for search-related keywords
-        if any(keyword in message_lower for keyword in [
-            "search", "find", "lookup", "google", "web", "information", "article"
-        ]):
-            capabilities.add("search")
-        
-        # Check for general conversation keywords
-        # This will match common conversation starters and questions
-        if any(keyword in message_lower for keyword in [
-            "hi", "hello", "hey", "thanks", "thank you", "how are you", 
-            "what's up", "who are you", "help me", "explain", "tell me about",
-            "what is", "how do", "can you", "please", "would you", "I'm", "I am",
-            "I think", "I feel", "I need"
-        ]) or message_lower.endswith("?"):
-            capabilities.add("assistant")
-        
-        # If we couldn't detect any specific intent, include "assistant" by default
-        # This ensures the general ChatBot will handle the message if no specialized bot can
+        # If no specific capabilities detected, use general assistant
         if not capabilities:
             capabilities.add("assistant")
-            self.logger.info("No specific capabilities detected, defaulting to assistant")
-        else:
-            self.logger.info(f"Detected capabilities: {capabilities}")
+            self.logger.info("No specific capabilities detected, defaulting to general assistant")
         
         return list(capabilities)
     
@@ -273,34 +319,12 @@ class CentralController:
         if len(bot_responses) == 1:
             return bot_responses[0]["response"]
         
-        # Check if there's both ChatBot and specialized bot responses
-        chat_bot_response = None
-        specialized_responses = []
-        
-        for response in bot_responses:
-            if response["bot_id"] == "chat_bot":
-                chat_bot_response = response
-            else:
-                specialized_responses.append(response)
-        
-        # If we have both types, prioritize specialized responses
-        # but use chat_bot for introduction or transitions
-        if chat_bot_response and specialized_responses:
-            combined = ""
-            
-            # Add specialized bot responses with their names
-            for i, response in enumerate(specialized_responses):
-                combined += f"**{response['bot_name']}**: {response['response']}"
-                if i < len(specialized_responses) - 1:
-                    combined += "\n\n"
-            
-            return combined
-        
-        # Otherwise, just combine all responses with bot names
+        # Multiple responses - format nicely
         combined = ""
         for i, response in enumerate(bot_responses):
+            # Only include bot name if multiple bots
             if len(bot_responses) > 1:
-                combined += f"**{response['bot_name']}**: {response['response']}"
+                combined += f"**{response['bot_name']}**:\n{response['response']}"
             else:
                 combined += response["response"]
             
@@ -309,24 +333,6 @@ class CentralController:
                 combined += "\n\n"
         
         return combined
-    
-    async def get_conversation_context(self, conversation_id: str) -> Dict[str, Any]:
-        """Get context for a conversation"""
-        # Get recent messages
-        messages = await self.database.get_conversation_history(conversation_id, limit=10)
-        
-        # Get any stored context for this conversation
-        stored_context = await self.database.get_conversation_context(conversation_id)
-        
-        # Combine into a complete context object
-        context = {
-            "messages": messages,
-            "conversation_id": conversation_id,
-            "timestamp": datetime.now().isoformat(),
-            **stored_context
-        }
-        
-        return context
     
     async def update_conversation_context(self, conversation_id: str, updates: Dict[str, Any]):
         """Update context for a conversation"""
