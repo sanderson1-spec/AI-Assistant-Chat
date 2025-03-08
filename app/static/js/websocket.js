@@ -62,6 +62,23 @@ const WebSocketManager = {
                     case 'message':
                         MessageHandler.handleIncomingMessage(data);
                         break;
+                    case 'notification':
+                        console.log('Notification received:', data);
+                        // Ensure NotificationHandler is available globally
+                        if (window.NotificationHandler) {
+                            window.NotificationHandler.handleNotification(data);
+                        } else {
+                            console.error('NotificationHandler not available');
+                            // Try to import it dynamically if not available
+                            import('./notification-handler.js').then(module => {
+                                window.NotificationHandler = module.default;
+                                window.NotificationHandler.init();
+                                window.NotificationHandler.handleNotification(data);
+                            }).catch(error => {
+                                console.error('Failed to load NotificationHandler:', error);
+                            });
+                        }
+                        break;
                     case 'error':
                         console.error('Server WebSocket error:', data.message);
                         MessageHandler.displaySystemMessage(data.message || 'An error occurred');
@@ -114,7 +131,7 @@ const WebSocketManager = {
      */
     sendMessage: function(messageData) {
         // Ensure we have a conversation ID
-        if (!messageData.conversation_id) {
+        if (!messageData.conversation_id && messageData.type === 'message') {
             messageData.conversation_id = ConversationManager.getCurrentConversationId();
         }
         
@@ -154,6 +171,14 @@ const WebSocketManager = {
      */
     isConnected: function() {
         return this.socket && this.socket.readyState === WebSocket.OPEN;
+    },
+    
+    /**
+     * Get user ID associated with this connection
+     * @returns {string} The user ID
+     */
+    getUserId: function() {
+        return this.userId;
     }
 };
 

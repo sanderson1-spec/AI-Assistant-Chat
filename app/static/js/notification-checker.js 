@@ -1,0 +1,153 @@
+/**
+ * Helper utility to diagnose notification problems
+ */
+
+// Run checks when the document is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Notification checker initialized');
+    
+    // Check if notification container exists
+    const checkNotificationContainer = () => {
+        const container = document.querySelector('.notifications-container');
+        console.log('Notification container exists:', !!container);
+        
+        if (!container) {
+            console.log('Creating notification container');
+            const newContainer = document.createElement('div');
+            newContainer.className = 'notifications-container';
+            document.body.appendChild(newContainer);
+            
+            // Add test notification
+            setTimeout(() => {
+                const testNotification = document.createElement('div');
+                testNotification.className = 'notification';
+                testNotification.textContent = 'This is a test notification';
+                newContainer.appendChild(testNotification);
+                console.log('Test notification added');
+            }, 2000);
+        }
+    };
+    
+    // Check if notification CSS is applied
+    const checkNotificationCSS = () => {
+        const testElement = document.createElement('div');
+        testElement.className = 'notification';
+        testElement.style.position = 'absolute';
+        testElement.style.left = '-9999px';
+        document.body.appendChild(testElement);
+        
+        // Get computed style
+        const style = window.getComputedStyle(testElement);
+        const hasCorrectStyle = 
+            style.backgroundColor === 'rgb(255, 255, 255)' && 
+            style.borderLeftWidth === '4px';
+        
+        console.log('Notification CSS is applied:', hasCorrectStyle);
+        
+        if (!hasCorrectStyle) {
+            console.log('Adding inline notification styles');
+            const style = document.createElement('style');
+            style.textContent = `
+                .notifications-container {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    max-width: 320px;
+                    z-index: 1000;
+                }
+                
+                .notification {
+                    background-color: white;
+                    border-left: 4px solid #4285f4;
+                    border-radius: 4px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    padding: 12px 15px;
+                    margin-bottom: 10px;
+                    width: 100%;
+                    position: relative;
+                    animation: slide-in 0.3s ease-out;
+                    cursor: pointer;
+                    transition: transform 0.3s ease, opacity 0.3s ease;
+                }
+                
+                @keyframes slide-in {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Clean up test element
+        document.body.removeChild(testElement);
+    };
+    
+    // Check if NotificationHandler is properly initialized
+    const checkNotificationHandler = () => {
+        console.log('NotificationHandler exists globally:', !!window.NotificationHandler);
+        
+        if (!window.NotificationHandler) {
+            console.log('Attempting to load NotificationHandler');
+            import('/static/js/notification-handler.js').then(module => {
+                window.NotificationHandler = module.default;
+                window.NotificationHandler.init();
+                console.log('NotificationHandler loaded and initialized');
+            }).catch(error => {
+                console.error('Failed to load NotificationHandler:', error);
+            });
+        } else {
+            // Try to show a test notification
+            setTimeout(() => {
+                window.NotificationHandler.showNotification({
+                    message: 'This is a test notification from the checker script',
+                    source_bot_id: 'test_bot',
+                    metadata: { type: 'test' }
+                });
+                console.log('Test notification triggered');
+            }, 3000);
+        }
+    };
+    
+    // Run checks
+    checkNotificationContainer();
+    checkNotificationCSS();
+    checkNotificationHandler();
+    
+    // Create test button
+    createTestButton();
+});
+
+// Create a button to manually trigger notifications for testing
+function createTestButton() {
+    const button = document.createElement('button');
+    button.textContent = 'Test Notification';
+    button.style.position = 'fixed';
+    button.style.bottom = '10px';
+    button.style.left = '10px';
+    button.style.zIndex = 1000;
+    button.style.padding = '5px 10px';
+    button.style.background = '#4285f4';
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.borderRadius = '4px';
+    button.style.cursor = 'pointer';
+    
+    button.onclick = () => {
+        if (window.NotificationHandler) {
+            window.NotificationHandler.showNotification({
+                message: 'Manual test notification',
+                source_bot_id: 'test_bot',
+                metadata: { type: 'test' }
+            });
+            console.log('Manual test notification triggered');
+        } else {
+            console.error('NotificationHandler not available');
+            alert('NotificationHandler not available');
+        }
+    };
+    
+    document.body.appendChild(button);
+}

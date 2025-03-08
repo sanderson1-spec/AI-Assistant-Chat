@@ -15,6 +15,7 @@ const NotificationHandler = {
             const container = document.createElement('div');
             container.className = 'notifications-container';
             document.body.appendChild(container);
+            console.log('Created notifications container');
         }
         
         // Create notification tray icon in corner
@@ -27,10 +28,181 @@ const NotificationHandler = {
             
             // Hide count if 0
             this.updateNotificationCount(0);
+            console.log('Created notifications tray');
         }
+        
+        // Ensure styles are loaded
+        this.ensureNotificationStyles();
         
         // Fetch unread notifications on startup
         this.fetchUnreadNotifications();
+        
+        console.log('Notification system initialized');
+    },
+    
+    /**
+     * Ensure notification styles are in the document
+     */
+    ensureNotificationStyles: function() {
+        // Check if styles are already loaded
+        const styleElement = document.getElementById('notification-styles');
+        if (styleElement) return;
+        
+        // Create style element
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = `
+        /* Notification System Styles */
+        .notifications-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 320px;
+            z-index: 1000;
+        }
+        
+        .notification {
+            background-color: white;
+            border-left: 4px solid #4285f4;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            width: 100%;
+            position: relative;
+            animation: slide-in 0.3s ease-out;
+            cursor: pointer;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .notification:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        /* Different colors based on the source bot */
+        .notification[data-source-bot="reminder_bot"] {
+            border-left-color: #ff9800;
+        }
+        
+        .notification[data-source-bot="todo_bot"] {
+            border-left-color: #4caf50;
+        }
+        
+        .notification[data-source-bot="calendar_bot"] {
+            border-left-color: #9c27b0;
+        }
+        
+        .notification[data-source-bot="email_bot"] {
+            border-left-color: #f44336;
+        }
+        
+        .notification[data-source-bot="notification_service"] {
+            border-left-color: #4285f4;
+        }
+        
+        /* Notification content */
+        .notification-content {
+            margin-bottom: 8px;
+            padding-right: 20px;
+        }
+        
+        /* Timestamp */
+        .notification-timestamp {
+            font-size: 11px;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        /* Close button */
+        .notification-close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+        
+        .notification-close:hover {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+        
+        /* Action button for actionable notifications */
+        .notification-action {
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        
+        .notification-action:hover {
+            background-color: #e3e3e3;
+        }
+        
+        /* Slide-in animation */
+        @keyframes slide-in {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Minimized notifications tray */
+        .notifications-tray {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4285f4;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .notifications-tray:hover {
+            background-color: #3367d6;
+        }
+        
+        .notifications-tray .count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #f44336;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        `;
+        
+        document.head.appendChild(style);
+        console.log('Added notification styles to document');
     },
     
     /**
@@ -38,7 +210,7 @@ const NotificationHandler = {
      * @param {Object} data - Notification data
      */
     handleNotification: function(data) {
-        console.log('Received notification:', data);
+        console.log('Handling notification:', data);
         
         // Play notification sound if available
         this.playNotificationSound();
@@ -46,8 +218,15 @@ const NotificationHandler = {
         // Create notification element
         const notificationElement = this.createNotificationElement(data);
         
-        // Add to container
-        const container = document.querySelector('.notifications-container');
+        // Add to container - ensure container exists first
+        let container = document.querySelector('.notifications-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'notifications-container';
+            document.body.appendChild(container);
+            console.log('Created notifications container on-demand');
+        }
+        
         container.appendChild(notificationElement);
         
         // Update notification count
@@ -148,7 +327,7 @@ const NotificationHandler = {
                 
                 // Update notification count
                 const container = document.querySelector('.notifications-container');
-                this.updateNotificationCount(container.children.length);
+                this.updateNotificationCount(container ? container.children.length : 0);
             }
         }, 300);
         
@@ -222,10 +401,12 @@ const NotificationHandler = {
     toggleNotificationsPanel: function() {
         const container = document.querySelector('.notifications-container');
         
-        if (container.style.display === 'none' || !container.style.display) {
-            container.style.display = 'flex';
-        } else {
-            container.style.display = 'none';
+        if (container) {
+            if (container.style.display === 'none' || !container.style.display) {
+                container.style.display = 'flex';
+            } else {
+                container.style.display = 'none';
+            }
         }
     },
     
@@ -270,10 +451,5 @@ const NotificationHandler = {
         });
     }
 };
-
-// Initialize when loaded
-document.addEventListener('DOMContentLoaded', () => {
-    NotificationHandler.init();
-});
 
 export default NotificationHandler;
