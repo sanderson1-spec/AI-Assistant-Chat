@@ -14,25 +14,33 @@ class EnhancedConnectionManager:
         self.user_connections: Dict[str, List[str]] = {}  # Maps user_id to list of client_ids
         self.logger = logging.getLogger("ai-assistant.websocket-manager")
     
-    async def connect(self, websocket: WebSocket, client_id: str, user_id: str = "default_user"):
+    async def connect(self, websocket: WebSocket, client_id: str):
         """
         Connect a WebSocket client
         
         Args:
             websocket: The WebSocket connection
             client_id: Unique client identifier
-            user_id: ID of the user associated with this connection
         """
         await websocket.accept()
         self.active_connections[client_id] = websocket
+        self.logger.info(f"Client {client_id} connected")
+    
+    def add_user_connection(self, client_id: str, user_id: str = "default_user"):
+        """
+        Associate a client connection with a user ID (without accepting the websocket again)
         
+        Args:
+            client_id: Unique client identifier
+            user_id: ID of the user associated with this connection
+        """
         # Associate this client with the user
         if user_id not in self.user_connections:
             self.user_connections[user_id] = []
         if client_id not in self.user_connections[user_id]:
             self.user_connections[user_id].append(client_id)
         
-        self.logger.info(f"Client {client_id} connected (User: {user_id})")
+        self.logger.info(f"Associated client {client_id} with user {user_id}")
     
     def disconnect(self, client_id: str):
         """

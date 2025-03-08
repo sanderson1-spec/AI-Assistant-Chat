@@ -4,6 +4,7 @@ Run this script to start the server.
 """
 import uvicorn
 import os
+import sys
 from app.config import CONFIG, DEBUG, logger, log_config
 
 # Create data directory if it doesn't exist
@@ -22,7 +23,7 @@ if __name__ == "__main__":
     logger.info(f"Make sure LMStudio is running with API server enabled at {CONFIG['lmstudio']['url']}")
     
     try:
-        # Start the server
+        # Start the server with the correct import path for main:app
         uvicorn.run(
             "app.main:app", 
             host=CONFIG["server"]["host"], 
@@ -32,5 +33,4 @@ if __name__ == "__main__":
         )
     except Exception as e:
         logger.error(f"Error starting application: {str(e)}", exc_info=DEBUG)
-        import sys
         sys.exit(1)

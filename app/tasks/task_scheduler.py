@@ -13,10 +13,14 @@ try:
     from apscheduler.schedulers.asyncio import AsyncIOScheduler
     from apscheduler.triggers.date import DateTrigger
     from apscheduler.triggers.interval import IntervalTrigger
+    from apscheduler.schedulers import SchedulerAlreadyRunningError
     SCHEDULER_AVAILABLE = True
 except ImportError:
     print("Warning: APScheduler not installed. Using a minimal scheduler implementation.")
     SCHEDULER_AVAILABLE = False
+    # Create stub exception for compatibility
+    class SchedulerAlreadyRunningError(Exception):
+        pass
 
 class MinimalScheduler:
     """Minimal scheduler implementation when APScheduler is not available"""
@@ -28,6 +32,9 @@ class MinimalScheduler:
     
     def start(self):
         """Start the scheduler"""
+        if self.running:
+            return  # Already running, do nothing
+            
         self.running = True
         self._task = asyncio.create_task(self._run())
         self.logger.info("Minimal scheduler started")
@@ -116,6 +123,7 @@ class TaskScheduler:
         self.database = database
         self.bot_registry = bot_registry
         self.notification_service = notification_service
+        self._initialized = False
         
         # Initialize scheduler based on availability
         if SCHEDULER_AVAILABLE:
@@ -127,54 +135,71 @@ class TaskScheduler:
     
     async def initialize(self):
         """Initialize the scheduler and load persisted tasks"""
+        # Skip if already initialized
+        if self._initialized:
+            self.logger.info("Task Scheduler already initialized, skipping")
+            return
+            
         self.logger.info("Initializing Task Scheduler")
         
-        # Start the scheduler
-        self.scheduler.start()
-        
-        # Load persisted tasks from database
-        await self.load_persisted_tasks()
-        
-        self.logger.info("Task Scheduler initialized")
+        try:
+            # Start the scheduler
+            try:
+                self.scheduler.start()
+                self.logger.info("Scheduler started successfully")
+            except SchedulerAlreadyRunningError:
+                self.logger.warning("Scheduler is already running, continuing with existing scheduler")
+            
+            # Load persisted tasks from database
+            await self.load_persisted_tasks()
+            
+            self._initialized = True
+            self.logger.info("Task Scheduler initialized successfully")
+        except Exception as e:
+            self.logger.error(f"Error initializing task scheduler: {str(e)}", exc_info=True)
+            raise
     
     async def load_persisted_tasks(self):
         """Load tasks from database and schedule them"""
-        tasks = await self.database.get_all_tasks()
-        scheduled_count = 0
-        
-        for task in tasks:
-            try:
-                # Parse task data
-                task_id = task['id']
-                execute_at = datetime.fromisoformat(task['execute_at'])
-                now = datetime.now()
-                
-                # Skip tasks that are too old
-                if not task['recurring'] and execute_at < now - timedelta(hours=1):
-                    self.logger.info(f"Skipping old task {task_id} scheduled for {execute_at}")
-                    continue
-                
-                # For missed one-time tasks, execute them now if they're recent
-                if not task['recurring'] and execute_at < now:
-                    execute_at = now + timedelta(seconds=5)  # Give a small buffer
-                
-                # Schedule the task
-                await self.schedule_task_internal(
-                    task_id=task_id,
-                    task_type=task['task_type'],
-                    bot_id=task['bot_id'],
-                    user_id=task['user_id'],
-                    execute_at=execute_at,
-                    params=json.loads(task['params']),
-                    recurring=bool(task['recurring']),
-                    interval=task['interval']
-                )
-                scheduled_count += 1
-                
-            except Exception as e:
-                self.logger.error(f"Error loading task {task.get('id')}: {str(e)}")
-        
-        self.logger.info(f"Loaded {scheduled_count} tasks from database")
+        try:
+            tasks = await self.database.get_all_tasks()
+            scheduled_count = 0
+            
+            for task in tasks:
+                try:
+                    # Parse task data
+                    task_id = task['id']
+                    execute_at = datetime.fromisoformat(task['execute_at'])
+                    now = datetime.now()
+                    
+                    # Skip tasks that are too old
+                    if not task['recurring'] and execute_at < now - timedelta(hours=1):
+                        self.logger.info(f"Skipping old task {task_id} scheduled for {execute_at}")
+                        continue
+                    
+                    # For missed one-time tasks, execute them now if they're recent
+                    if not task['recurring'] and execute_at < now:
+                        execute_at = now + timedelta(seconds=5)  # Give a small buffer
+                    
+                    # Schedule the task
+                    await self.schedule_task_internal(
+                        task_id=task_id,
+                        task_type=task['task_type'],
+                        bot_id=task['bot_id'],
+                        user_id=task['user_id'],
+                        execute_at=execute_at,
+                        params=json.loads(task['params']),
+                        recurring=bool(task['recurring']),
+                        interval=task['interval']
+                    )
+                    scheduled_count += 1
+                    
+                except Exception as e:
+                    self.logger.error(f"Error loading task {task.get('id')}: {str(e)}", exc_info=True)
+            
+            self.logger.info(f"Loaded {scheduled_count} tasks from database")
+        except Exception as e:
+            self.logger.error(f"Error loading tasks from database: {str(e)}", exc_info=True)
     
     async def schedule_task(
         self, 
@@ -300,7 +325,14 @@ class TaskScheduler:
                 datetime.now().isoformat()
             )
             
-            # Get the bot that handles this task type
+            # Special handling for notification delivery task
+            if task_type == "deliver_notification" and bot_id == "notification_service":
+                notification_id = params.get("notification_id")
+                if notification_id:
+                    await self.notification_service.deliver_scheduled_notification(notification_id)
+                return
+            
+            # For regular tasks, get the bot that handles this task type
             bot = self.bot_registry.get_bot(bot_id)
             if not bot:
                 self.logger.error(f"Bot {bot_id} not found for task {task_id}")
@@ -324,11 +356,10 @@ class TaskScheduler:
             if task and not task.get("recurring"):
                 await self.database.remove_task(task_id)
                 
-            self.logger.info(f"Task {task_id} execution completed")
+            self.logger.info(f"Task {task_id} execution completed successfully")
             
         except Exception as e:
-            self.logger.error(f"Error executing task {task_id}: {str(e)}")
-            # Could implement retry logic here
+            self.logger.error(f"Error executing task {task_id}: {str(e)}", exc_info=True)
     
     async def cancel_task(self, task_id: str) -> bool:
         """Cancel a scheduled task"""
@@ -348,15 +379,25 @@ class TaskScheduler:
     
     async def get_upcoming_tasks(self, user_id: str, limit: int = 10) -> List[Dict[str, Any]]:
         """Get upcoming tasks for a user"""
-        tasks = await self.database.get_user_tasks(user_id)
-        
-        # Sort by execute_at
-        tasks.sort(key=lambda t: datetime.fromisoformat(t["execute_at"]))
-        
-        # Limit the number of results
-        return tasks[:limit]
+        try:
+            tasks = await self.database.get_user_tasks(user_id)
+            
+            # Sort by execute_at
+            tasks.sort(key=lambda t: datetime.fromisoformat(t["execute_at"]))
+            
+            # Limit the number of results
+            return tasks[:limit]
+        except Exception as e:
+            self.logger.error(f"Error getting upcoming tasks: {str(e)}")
+            return []
     
     def shutdown(self):
         """Shutdown the scheduler"""
+        if not self._initialized:
+            return
+            
         self.logger.info("Shutting down Task Scheduler")
-        self.scheduler.shutdown()
+        try:
+            self.scheduler.shutdown()
+        except Exception as e:
+            self.logger.error(f"Error shutting down scheduler: {str(e)}")

@@ -9,8 +9,18 @@ import os
 import json
 import uuid
 import logging
+import sys
 from datetime import datetime
 from typing import Dict, List, Any, Optional
+
+# Configure root logger
+logging.basicConfig(
+    level=logging.DEBUG if os.environ.get("AI_ASSISTANT_DEBUG", "false").lower() in ("true", "1", "yes", "y") else logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 
 # Import existing components
 from app.database.database import Database
@@ -18,7 +28,7 @@ from app.llm.lmstudio_client import LMStudioClient
 from app.config import CONFIG, DEBUG, logger
 
 # Import AI Agents components
-from app.bots.bot_framework import BotRegistry
+from app.bots.bot_framework import BotRegistry, BaseBot, BotCapability
 from app.bots.reminder_bot import ReminderBot
 from app.tasks.task_scheduler import TaskScheduler
 from app.notifications.notification_service import NotificationService
@@ -65,13 +75,16 @@ app = FastAPI(title="AI Assistant")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/static")
 
+# Create data directory if it doesn't exist
+os.makedirs("data", exist_ok=True)
+
 # Initialize database
 db = Database(db_path=CONFIG["database"]["path"])
 
 # Initialize LMStudio client
 lmstudio_url = CONFIG["lmstudio"]["url"]
 llm_client = LMStudioClient(base_url=lmstudio_url)
-print(f"Connecting to LMStudio at: {lmstudio_url}")
+logger.info(f"Connecting to LMStudio at: {lmstudio_url}")
 
 # Initialize the Enhanced WebSocket connection manager
 manager = EnhancedConnectionManager()
@@ -83,20 +96,58 @@ task_scheduler = TaskScheduler(db, bot_registry, notification_service)
 notification_service.set_task_scheduler(task_scheduler)  # Resolve circular dependency
 controller = CentralController(db, bot_registry, task_scheduler, notification_service, llm_client)
 
-# Register specialized bots
-reminder_bot = ReminderBot()
-bot_registry.register_bot(reminder_bot)
+# Register specialized bots - will be done in startup event to ensure proper initialization
 
 # Startup and shutdown events
 @app.on_event("startup")
 async def startup_event():
     logger.info("Starting AI Assistant with enhanced architecture")
     
-    # Create data directory if it doesn't exist
-    os.makedirs("data", exist_ok=True)
+    # Register specialized bots
+    logger.info("Registering specialized bots...")
+    
+    # Initialize and register the reminder bot
+    try:
+        # First check if dateparser is available
+        try:
+            import dateparser
+            logger.info("Dateparser is available")
+        except ImportError:
+            logger.warning("Dateparser not installed - ReminderBot will have limited functionality")
+        
+        # Initialize and register reminder bot
+        reminder_bot = ReminderBot()
+        bot_registry.register_bot(reminder_bot)
+        logger.info(f"Registered ReminderBot with capabilities: {[cap.name for cap in reminder_bot.capabilities]}")
+    except Exception as e:
+        logger.error(f"Error registering ReminderBot: {str(e)}", exc_info=True)
+    
+    # List all registered bots and their capabilities
+    all_bots = bot_registry.get_all_bots()
+    logger.info(f"Registered bots ({len(all_bots)}): {[bot.id for bot in all_bots]}")
+    for bot in all_bots:
+        logger.info(f"Bot {bot.id} has capabilities: {[cap.name for cap in bot.capabilities]}")
+        logger.info(f"Bot {bot.id} has task types: {bot.task_types}")
+    
+    # List all capabilities in the registry
+    all_capabilities = bot_registry.capability_map.keys()
+    logger.info(f"Registered capabilities: {list(all_capabilities)}")
+    
+    # Log whether bots are available for each capability
+    for cap in all_capabilities:
+        bots = bot_registry.get_bots_for_capability(cap)
+        logger.info(f"Capability '{cap}' has {len(bots)} bot(s): {[bot.id for bot in bots]}")
+    
+    # Dump registry state for debugging
+    registry_state = bot_registry.dump_registry_state()
+    logger.debug(f"Bot registry state: {json.dumps(registry_state, indent=2)}")
     
     # Initialize the task scheduler
-    await task_scheduler.initialize()
+    try:
+        await task_scheduler.initialize()
+    except Exception as e:
+        logger.error(f"Error initializing task scheduler: {str(e)}", exc_info=True)
+        # Continue anyway - we can still function without the scheduler for basic chat
     
     logger.info("AI Assistant started successfully")
 
@@ -105,7 +156,10 @@ def shutdown_event():
     logger.info("Shutting down AI Assistant")
     
     # Shutdown the task scheduler
-    task_scheduler.shutdown()
+    try:
+        task_scheduler.shutdown()
+    except Exception as e:
+        logger.error(f"Error shutting down task scheduler: {str(e)}")
 
 # Routes
 @app.get("/", response_class=HTMLResponse)
@@ -258,6 +312,7 @@ async def rewind_to_message(message_id: int, request: RewindRequest = Body(...))
 # WebSocket endpoint for communication
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str):
+    # Accept the connection only once
     await manager.connect(websocket, client_id)
     
     try:
@@ -265,22 +320,26 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
         data = await websocket.receive_json()
         user_id = data.get("user_id", "default_user")
         
-        # Update connection with user ID
-        await manager.connect(websocket, client_id, user_id)
+        # Update connection with user ID but don't accept the connection again
+        # Just update the tracking in the manager
+        manager.add_user_connection(client_id, user_id)
         
         # Send pending notifications for this user
-        notifications = await notification_service.get_user_notifications(user_id)
-        if notifications:
-            agents_logger.info(f"Sending {len(notifications)} pending notifications to user {user_id}")
-            for notification in notifications:
-                await manager.send_message(client_id, {
-                    "type": "notification",
-                    "id": notification["id"],
-                    "message": notification["message"],
-                    "source_bot_id": notification.get("source_bot_id"),
-                    "metadata": notification.get("metadata"),
-                    "timestamp": notification.get("created_at")
-                })
+        try:
+            notifications = await notification_service.get_user_notifications(user_id)
+            if notifications:
+                agents_logger.info(f"Sending {len(notifications)} pending notifications to user {user_id}")
+                for notification in notifications:
+                    await manager.send_message(client_id, {
+                        "type": "notification",
+                        "id": notification["id"],
+                        "message": notification["message"],
+                        "source_bot_id": notification.get("source_bot_id"),
+                        "metadata": notification.get("metadata"),
+                        "timestamp": notification.get("created_at")
+                    })
+        except Exception as e:
+            logger.error(f"Error sending pending notifications: {str(e)}", exc_info=True)
         
         # Process messages
         while True:
@@ -314,18 +373,31 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                     conversation_id = conv_id
                 
                 # Process with the Central Controller
-                response = await controller.process_message(user_id, message, conversation_id)
-                
-                # Send response back to client
-                await manager.send_message(client_id, {
-                    "type": "message",
-                    "conversation_id": response["conversation_id"],
-                    "content": response["response"],
-                    "role": "assistant",
-                    "id": response["message_id"],
-                    "parent_id": response["parent_id"],
-                    "edit_message_id": edit_message_id  # Pass back the edit ID if this was an edit
-                })
+                try:
+                    response = await controller.process_message(user_id, message, conversation_id)
+                    
+                    # Send response back to client
+                    await manager.send_message(client_id, {
+                        "type": "message",
+                        "conversation_id": response["conversation_id"],
+                        "content": response["response"],
+                        "role": "assistant",
+                        "id": response["message_id"],
+                        "parent_id": response["parent_id"],
+                        "edit_message_id": edit_message_id  # Pass back the edit ID if this was an edit
+                    })
+                except Exception as e:
+                    logger.error(f"Error processing message: {str(e)}", exc_info=True)
+                    # Send error response to client
+                    await manager.send_message(client_id, {
+                        "type": "message",
+                        "conversation_id": conversation_id,
+                        "content": "I'm sorry, I encountered an error processing your message. Please try again.",
+                        "role": "assistant",
+                        "id": 0,  # Temporary ID
+                        "parent_id": message_id,
+                        "edit_message_id": edit_message_id
+                    })
             
             elif message_type == "notification_read":
                 # Mark notification as read

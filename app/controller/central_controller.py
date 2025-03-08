@@ -4,6 +4,7 @@ Orchestrates communication between user and specialized bots
 """
 import logging
 import uuid
+import json
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
@@ -30,7 +31,7 @@ class CentralController:
         Returns:
             Response data including text and metadata
         """
-        self.logger.info(f"Processing message from user {user_id}")
+        self.logger.info(f"Processing message from user {user_id}: {message[:50]}...")
         
         # If no conversation ID, create a new one
         if not conversation_id:
@@ -54,6 +55,13 @@ class CentralController:
         
         # Analyze intent to determine which bots should process the message
         capabilities = await self.analyze_message_intent(message, context)
+        self.logger.info(f"Detected capabilities: {capabilities}")
+        
+        # Debug available bots
+        all_bots = self.bot_registry.get_all_bots()
+        self.logger.info(f"Available bots: {[bot.id for bot in all_bots]}")
+        for bot in all_bots:
+            self.logger.info(f"Bot {bot.id} capabilities: {[cap.name for cap in bot.capabilities]}")
         
         # Collect responses from appropriate bots
         bot_responses = []
@@ -64,6 +72,7 @@ class CentralController:
         for capability in capabilities:
             # Get bots that can handle this capability
             bots = self.bot_registry.get_bots_for_capability(capability)
+            self.logger.info(f"Bots for capability '{capability}': {[bot.id for bot in bots]}")
             
             # Skip if no bots can handle this capability
             if not bots:
@@ -76,7 +85,9 @@ class CentralController:
             
             # Process the message with this bot
             try:
+                self.logger.info(f"Processing message with bot {bot.id}")
                 response = await bot.process_message(user_id, message, context)
+                self.logger.info(f"Bot {bot.id} response: {str(response)[:200]}...")
                 
                 # Collect response data
                 if response.get("response"):
@@ -103,11 +114,12 @@ class CentralController:
                     context_updates.update(response["context_updates"])
                     
             except Exception as e:
-                self.logger.error(f"Error processing message with bot {bot.id}: {str(e)}")
+                self.logger.error(f"Error processing message with bot {bot.id}: {str(e)}", exc_info=True)
                 # Don't let one bot failure prevent others from processing
         
         # If no bot could handle the message, use fallback response
         if not bot_responses:
+            self.logger.warning("No bot responses generated, using fallback")
             bot_responses.append({
                 "bot_id": "central_controller",
                 "bot_name": "Assistant",
@@ -193,44 +205,53 @@ class CentralController:
         # Fallback to a simple keyword-based approach
         capabilities = set()
         
+        # Debug message
+        self.logger.info(f"Analyzing message for intents: '{message}'")
+        
         # Check for time-related keywords (reminder bot)
-        if any(keyword in message.lower() for keyword in [
-            "remind", "reminder", "schedule", "timer", "alarm", "in 5 minutes", 
-            "tomorrow", "later", "notification", "alert me", "notify"
-        ]):
+        reminder_keywords = ["remind", "reminder", "schedule", "timer", "alarm", "in 5 minutes", 
+                           "tomorrow", "later", "notification", "alert me", "notify"]
+        
+        if any(keyword in message.lower() for keyword in reminder_keywords):
             capabilities.add("reminders")
+            self.logger.info(f"Found reminder keywords in message")
         
         # Check for todo-related keywords
-        if any(keyword in message.lower() for keyword in [
-            "todo", "task", "list", "add item", "mark complete", "finish",
-            "to-do", "to do", "checklist", "complete", "add a task"
-        ]):
+        todo_keywords = ["todo", "task", "list", "add item", "mark complete", "finish",
+                       "to-do", "to do", "checklist", "complete", "add a task"]
+        
+        if any(keyword in message.lower() for keyword in todo_keywords):
             capabilities.add("todos")
+            self.logger.info(f"Found todo keywords in message")
         
         # Check for calendar-related keywords
-        if any(keyword in message.lower() for keyword in [
-            "calendar", "meeting", "appointment", "schedule", "event",
-            "book", "reservation", "availability"
-        ]):
+        calendar_keywords = ["calendar", "meeting", "appointment", "schedule", "event",
+                           "book", "reservation", "availability"]
+        
+        if any(keyword in message.lower() for keyword in calendar_keywords):
             capabilities.add("calendar")
+            self.logger.info(f"Found calendar keywords in message")
         
         # Check for email-related keywords
-        if any(keyword in message.lower() for keyword in [
-            "email", "mail", "send", "draft", "compose", "write"
-        ]):
+        email_keywords = ["email", "mail", "send", "draft", "compose", "write"]
+        
+        if any(keyword in message.lower() for keyword in email_keywords):
             capabilities.add("email")
+            self.logger.info(f"Found email keywords in message")
         
         # Check for search-related keywords
-        if any(keyword in message.lower() for keyword in [
-            "search", "find", "lookup", "google", "web", "information", "article"
-        ]):
+        search_keywords = ["search", "find", "lookup", "google", "web", "information", "article"]
+        
+        if any(keyword in message.lower() for keyword in search_keywords):
             capabilities.add("search")
+            self.logger.info(f"Found search keywords in message")
         
         # If we couldn't detect any specific intent, include general assistant
         if not capabilities:
             capabilities.add("assistant")
+            self.logger.info(f"No specific capabilities detected, using assistant")
         
-        self.logger.info(f"Detected capabilities: {capabilities}")
+        self.logger.info(f"Final detected capabilities: {capabilities}")
         return list(capabilities)
     
     def combine_responses(self, bot_responses: List[Dict[str, Any]]) -> str:

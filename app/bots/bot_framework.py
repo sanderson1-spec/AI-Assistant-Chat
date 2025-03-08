@@ -26,6 +26,9 @@ class BotCapability:
             "keywords": self.keywords,
             "priority": self.priority
         }
+    
+    def __str__(self):
+        return f"Capability({self.name}, priority={self.priority})"
 
 class BaseBot(ABC):
     """Abstract base class for all specialized bots"""
@@ -36,15 +39,18 @@ class BaseBot(ABC):
         self.description = description
         self.capabilities: List[BotCapability] = []
         self.task_types: List[str] = []
+        self.logger = logging.getLogger(f"ai-assistant.bot.{bot_id}")
     
     def register_capability(self, capability: BotCapability) -> None:
         """Register a new capability for this bot"""
         self.capabilities.append(capability)
+        self.logger.info(f"Registered capability '{capability.name}' for bot {self.id}")
     
     def register_task_type(self, task_type: str) -> None:
         """Register a task type this bot can handle"""
         if task_type not in self.task_types:
             self.task_types.append(task_type)
+            self.logger.info(f"Registered task type '{task_type}' for bot {self.id}")
     
     @abstractmethod
     async def process_message(self, user_id: str, message: str, context: Dict[str, Any]) -> Dict[str, Any]:
@@ -121,8 +127,11 @@ class BotRegistry:
         
         # Register capabilities
         for capability in bot.capabilities:
+            self.logger.info(f"Registering capability '{capability.name}' for bot {bot.id}")
+            
             if capability.name not in self.capability_map:
                 self.capability_map[capability.name] = []
+                
             self.capability_map[capability.name].append(bot)
             
             # Sort by priority (higher first)
@@ -136,9 +145,18 @@ class BotRegistry:
         
         # Register task types
         for task_type in bot.task_types:
+            self.logger.info(f"Registering task type '{task_type}' for bot {bot.id}")
             self.task_map[task_type] = bot
             
         self.logger.info(f"Registered bot: {bot.id} ({bot.name}) with {len(bot.capabilities)} capabilities")
+        
+        # Debug check that capabilities are properly registered
+        for capability in bot.capabilities:
+            bots_for_capability = self.get_bots_for_capability(capability.name)
+            if bot in bots_for_capability:
+                self.logger.info(f"Confirmed: Bot {bot.id} is registered for capability '{capability.name}'")
+            else:
+                self.logger.error(f"ERROR: Bot {bot.id} FAILED to register for capability '{capability.name}'")
     
     def unregister_bot(self, bot_id: str) -> None:
         """Unregister a bot from the system"""
@@ -154,11 +172,13 @@ class BotRegistry:
                     b for b in self.capability_map[capability.name] 
                     if b.id != bot_id
                 ]
+                self.logger.info(f"Removed bot {bot_id} from capability '{capability.name}'")
         
         # Remove from task map
         for task_type in bot.task_types:
             if task_type in self.task_map and self.task_map[task_type].id == bot_id:
                 del self.task_map[task_type]
+                self.logger.info(f"Removed bot {bot_id} from task type '{task_type}'")
         
         # Remove from bots dictionary
         del self.bots[bot_id]
@@ -170,12 +190,45 @@ class BotRegistry:
     
     def get_bots_for_capability(self, capability_name: str) -> List[BaseBot]:
         """Get all bots that provide a specific capability"""
-        return self.capability_map.get(capability_name, [])
+        bots = self.capability_map.get(capability_name, [])
+        self.logger.debug(f"Found {len(bots)} bots for capability '{capability_name}': {[bot.id for bot in bots]}")
+        return bots
     
     def get_bot_for_task(self, task_type: str) -> Optional[BaseBot]:
         """Get the bot that handles a specific task type"""
-        return self.task_map.get(task_type)
+        bot = self.task_map.get(task_type)
+        if bot:
+            self.logger.debug(f"Found bot {bot.id} for task type '{task_type}'")
+        else:
+            self.logger.debug(f"No bot found for task type '{task_type}'")
+        return bot
     
     def get_all_bots(self) -> List[BaseBot]:
         """Get all registered bots"""
         return list(self.bots.values())
+    
+    def dump_registry_state(self) -> Dict[str, Any]:
+        """Create a debug dump of the registry state"""
+        state = {
+            "bots": {},
+            "capabilities": {},
+            "tasks": {}
+        }
+        
+        # Dump bot info
+        for bot_id, bot in self.bots.items():
+            state["bots"][bot_id] = {
+                "name": bot.name,
+                "capabilities": [cap.name for cap in bot.capabilities],
+                "task_types": bot.task_types
+            }
+        
+        # Dump capability map
+        for cap_name, bots in self.capability_map.items():
+            state["capabilities"][cap_name] = [bot.id for bot in bots]
+            
+        # Dump task map
+        for task_type, bot in self.task_map.items():
+            state["tasks"][task_type] = bot.id
+            
+        return state
