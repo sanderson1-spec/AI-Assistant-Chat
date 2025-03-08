@@ -12,6 +12,7 @@ import logging
 import sys
 from datetime import datetime
 from typing import Dict, List, Any, Optional
+from app.bots.chat_bot import ChatBot
 
 # Configure root logger
 logging.basicConfig(
@@ -122,6 +123,14 @@ async def startup_event():
     except Exception as e:
         logger.error(f"Error registering ReminderBot: {str(e)}", exc_info=True)
     
+    # Initialize and register chat bot
+    try:
+        chat_bot = ChatBot()
+        bot_registry.register_bot(chat_bot)
+        logger.info(f"Registered ChatBot with capabilities: {[cap.name for cap in chat_bot.capabilities]}")
+    except Exception as e:
+        logger.error(f"Error registering ChatBot: {str(e)}", exc_info=True)
+
     # List all registered bots and their capabilities
     all_bots = bot_registry.get_all_bots()
     logger.info(f"Registered bots ({len(all_bots)}): {[bot.id for bot in all_bots]}")

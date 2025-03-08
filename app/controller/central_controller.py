@@ -202,56 +202,61 @@ class CentralController:
             except Exception as e:
                 self.logger.error(f"Error using LLM for intent analysis: {str(e)}")
         
-        # Fallback to a simple keyword-based approach
+        # Fallback to keyword-based approach
         capabilities = set()
-        
-        # Debug message
-        self.logger.info(f"Analyzing message for intents: '{message}'")
+        message_lower = message.lower()
         
         # Check for time-related keywords (reminder bot)
-        reminder_keywords = ["remind", "reminder", "schedule", "timer", "alarm", "in 5 minutes", 
-                           "tomorrow", "later", "notification", "alert me", "notify"]
-        
-        if any(keyword in message.lower() for keyword in reminder_keywords):
+        if any(keyword in message_lower for keyword in [
+            "remind", "reminder", "schedule", "timer", "alarm", "in 5 minutes", 
+            "tomorrow", "later", "notification", "alert me", "notify"
+        ]):
             capabilities.add("reminders")
-            self.logger.info(f"Found reminder keywords in message")
         
         # Check for todo-related keywords
-        todo_keywords = ["todo", "task", "list", "add item", "mark complete", "finish",
-                       "to-do", "to do", "checklist", "complete", "add a task"]
-        
-        if any(keyword in message.lower() for keyword in todo_keywords):
+        if any(keyword in message_lower for keyword in [
+            "todo", "task", "list", "add item", "mark complete", "finish",
+            "to-do", "to do", "checklist", "complete", "add a task"
+        ]):
             capabilities.add("todos")
-            self.logger.info(f"Found todo keywords in message")
         
         # Check for calendar-related keywords
-        calendar_keywords = ["calendar", "meeting", "appointment", "schedule", "event",
-                           "book", "reservation", "availability"]
-        
-        if any(keyword in message.lower() for keyword in calendar_keywords):
+        if any(keyword in message_lower for keyword in [
+            "calendar", "meeting", "appointment", "schedule", "event",
+            "book", "reservation", "availability"
+        ]):
             capabilities.add("calendar")
-            self.logger.info(f"Found calendar keywords in message")
         
         # Check for email-related keywords
-        email_keywords = ["email", "mail", "send", "draft", "compose", "write"]
-        
-        if any(keyword in message.lower() for keyword in email_keywords):
+        if any(keyword in message_lower for keyword in [
+            "email", "mail", "send", "draft", "compose", "write"
+        ]):
             capabilities.add("email")
-            self.logger.info(f"Found email keywords in message")
         
         # Check for search-related keywords
-        search_keywords = ["search", "find", "lookup", "google", "web", "information", "article"]
-        
-        if any(keyword in message.lower() for keyword in search_keywords):
+        if any(keyword in message_lower for keyword in [
+            "search", "find", "lookup", "google", "web", "information", "article"
+        ]):
             capabilities.add("search")
-            self.logger.info(f"Found search keywords in message")
         
-        # If we couldn't detect any specific intent, include general assistant
+        # Check for general conversation keywords
+        # This will match common conversation starters and questions
+        if any(keyword in message_lower for keyword in [
+            "hi", "hello", "hey", "thanks", "thank you", "how are you", 
+            "what's up", "who are you", "help me", "explain", "tell me about",
+            "what is", "how do", "can you", "please", "would you", "I'm", "I am",
+            "I think", "I feel", "I need"
+        ]) or message_lower.endswith("?"):
+            capabilities.add("assistant")
+        
+        # If we couldn't detect any specific intent, include "assistant" by default
+        # This ensures the general ChatBot will handle the message if no specialized bot can
         if not capabilities:
             capabilities.add("assistant")
-            self.logger.info(f"No specific capabilities detected, using assistant")
+            self.logger.info("No specific capabilities detected, defaulting to assistant")
+        else:
+            self.logger.info(f"Detected capabilities: {capabilities}")
         
-        self.logger.info(f"Final detected capabilities: {capabilities}")
         return list(capabilities)
     
     def combine_responses(self, bot_responses: List[Dict[str, Any]]) -> str:
@@ -268,12 +273,34 @@ class CentralController:
         if len(bot_responses) == 1:
             return bot_responses[0]["response"]
         
-        # Multiple responses - format nicely
+        # Check if there's both ChatBot and specialized bot responses
+        chat_bot_response = None
+        specialized_responses = []
+        
+        for response in bot_responses:
+            if response["bot_id"] == "chat_bot":
+                chat_bot_response = response
+            else:
+                specialized_responses.append(response)
+        
+        # If we have both types, prioritize specialized responses
+        # but use chat_bot for introduction or transitions
+        if chat_bot_response and specialized_responses:
+            combined = ""
+            
+            # Add specialized bot responses with their names
+            for i, response in enumerate(specialized_responses):
+                combined += f"**{response['bot_name']}**: {response['response']}"
+                if i < len(specialized_responses) - 1:
+                    combined += "\n\n"
+            
+            return combined
+        
+        # Otherwise, just combine all responses with bot names
         combined = ""
         for i, response in enumerate(bot_responses):
-            # Only include bot name if multiple bots
             if len(bot_responses) > 1:
-                combined += f"**{response['bot_name']}**:\n{response['response']}"
+                combined += f"**{response['bot_name']}**: {response['response']}"
             else:
                 combined += response["response"]
             
