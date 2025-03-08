@@ -33,26 +33,6 @@ class ChatBot(BaseBot):
         """Process general conversation messages"""
         self.logger.info(f"ChatBot processing message: {message[:50]}...")
         
-        # Handle factual questions - the intent is to let the LLM handle these
-        # by returning a generic response that will be replaced by the LLM's output
-        if "einstein" in message.lower() and "born" in message.lower():
-            return {
-                "response": "Albert Einstein was born in Ulm, Germany on March 14, 1879."
-            }
-        
-        # Handle other factual questions by returning a response that allows
-        # the LLM to generate an appropriate answer
-        if "?" in message or any(q in message.lower() for q in ["what", "who", "where", "when", "why", "how"]):
-            return {
-                "response": "I'll help you with that question."  # This will be replaced by the LLM's response
-            }
-        
-        # Handle reminders and other specific intents by deferring to specialized bots
-        if any(word in message.lower() for word in ["remind", "reminder", "schedule", "alarm"]):
-            return {
-                "response": "I can help you set a reminder. What would you like to be reminded about?"
-            }
-        
         # Handle greetings
         if any(greeting in message.lower() for greeting in ["hello", "hi", "hey", "greetings"]):
             return {
@@ -71,10 +51,9 @@ class ChatBot(BaseBot):
                 "response": "Goodbye! Feel free to chat again whenever you need assistance."
             }
         
-        # Default response for general conversation
-        return {
-            "response": "I'm here to help. Please let me know what you need."
-        }
+        # For questions, general conversation, and information requests,
+        # return None to let the LLM handle it
+        return {"response": None}
     
     async def execute_task(self, task_type: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """

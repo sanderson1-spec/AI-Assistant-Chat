@@ -3,6 +3,7 @@ import json
 import traceback
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
+import dateparser
 
 class LMStudioClient:
     """Client for interacting with locally hosted LMStudio"""
@@ -126,3 +127,59 @@ class LMStudioClient:
         except Exception as e:
             print(f"Error analyzing intent: {str(e)}")
             return ['assistant']
+
+    async def detect_tasks(self, response: str) -> List[Dict[str, Any]]:
+        """
+        Analyze an LLM response for potential tasks and deadlines
+        
+        Args:
+            response: The LLM's response text
+            
+        Returns:
+            List of detected tasks with their deadlines
+        """
+        # Prepare messages for task detection
+        messages = [
+            {
+                "role": "system",
+                "content": "You are a task detector. Analyze the following text and identify any tasks with deadlines. "
+                          "Return a JSON array of tasks, each with 'text' and 'deadline' fields. "
+                          "Return an empty array if no tasks are found. Example: "
+                          '[{"text": "finish report", "deadline": "10 PM today"}]'
+            },
+            {"role": "user", "content": response}
+        ]
+        
+        try:
+            # Use generate_response to get task analysis
+            task_response = await self.generate_response(messages, None)
+            
+            try:
+                # Parse the response as JSON
+                tasks = json.loads(task_response)
+                if not isinstance(tasks, list):
+                    return []
+                
+                # Validate and process each task
+                valid_tasks = []
+                for task in tasks:
+                    if isinstance(task, dict) and 'text' in task and 'deadline' in task:
+                        # Try to parse the deadline
+                        try:
+                            if DATEPARSER_AVAILABLE:
+                                deadline = dateparser.parse(task['deadline'])
+                                if deadline:
+                                    valid_tasks.append({
+                                        'text': task['text'],
+                                        'deadline': deadline
+                                    })
+                        except Exception:
+                            continue
+                
+                return valid_tasks
+            except json.JSONDecodeError:
+                return []
+                
+        except Exception as e:
+            print(f"Error detecting tasks: {str(e)}")
+            return []

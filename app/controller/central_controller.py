@@ -7,6 +7,10 @@ import uuid
 import json
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
+import random
+
+from app.bots.reminder_bot import ReminderBot
+from app.bots.proactive_bot import ProactiveBot
 
 class CentralController:
     """Coordinates the AI Assistant system and delegates to specialized bots"""
@@ -18,6 +22,32 @@ class CentralController:
         self.notification_service = notification_service
         self.llm_client = llm_client  # LLM client for general conversation
         self.logger = logging.getLogger("ai-assistant.central-controller")
+        
+        # Initialize and register ProactiveBot
+        if llm_client:
+            proactive_bot = ProactiveBot(llm_client)
+            self.bot_registry.register_bot(proactive_bot)
+            
+            # Schedule initial proactive message
+            self._schedule_initial_proactive_message()
+    
+    async def _schedule_initial_proactive_message(self):
+        """Schedule the first proactive message"""
+        try:
+            # Schedule first proactive message for 30-60 minutes from now
+            initial_delay = random.randint(30, 60)
+            next_time = datetime.now() + timedelta(minutes=initial_delay)
+            
+            await self.task_scheduler.schedule_task(
+                task_type="proactive_message",
+                bot_id="proactive_bot",
+                user_id="default_user",  # You might want to adjust this
+                execute_at=next_time,
+                params={}
+            )
+            self.logger.info(f"Scheduled initial proactive message for {next_time}")
+        except Exception as e:
+            self.logger.error(f"Error scheduling initial proactive message: {str(e)}")
     
     async def process_message(self, user_id: str, message: str, conversation_id: Optional[str] = None):
         """
@@ -53,42 +83,88 @@ class CentralController:
         # Get conversation context
         context = await self.get_conversation_context(conversation_id)
         
-        # Attempt to analyze intent and identify capabilities
+        # Analyze message intent
+        capabilities = []
         try:
-            if self.llm_client and hasattr(self.llm_client, 'analyze_intent'):
+            if self.llm_client:
                 capabilities = await self.llm_client.analyze_intent(message, context)
-            else:
+            if not capabilities:
                 capabilities = await self.analyze_message_intent(message, context)
         except Exception as e:
-            self.logger.error(f"Error analyzing intent: {str(e)}")
-            capabilities = ['assistant']
+            self.logger.error(f"Error analyzing intent: {str(e)}", exc_info=True)
+            capabilities = await self.analyze_message_intent(message, context)
         
-        # If no specific capabilities detected or only general assistant, use LLM
-        if not capabilities or capabilities == ['assistant']:
+        # If no specific capabilities detected, use general assistant
+        if not capabilities:
+            capabilities = ["assistant"]
+        
+        # Try to get response from LLM first
+        llm_response = None
+        if self.llm_client:
             try:
-                # Prepare message for LLM
-                llm_messages = [
-                    {"role": "user", "content": message}
-                ]
+                llm_response = await self.llm_client.generate_response([{"role": "user", "content": message}], context)
                 
-                # Generate response from LLM with full context
-                response = await self.llm_client.generate_response(llm_messages, context)
+                # Store the LLM response for later use
+                combined_response = llm_response
                 
-                # Store assistant response
-                response_id, _ = await self.database.store_message(
-                    user_id=user_id,
-                    content=response,
-                    role="assistant",
-                    conversation_id=conversation_id,
-                    parent_id=message_id
-                )
+                # Detect tasks in LLM response
+                tasks = await self.llm_client.detect_tasks(llm_response)
+                if tasks:
+                    self.logger.info(f"Detected {len(tasks)} tasks in LLM response")
+                    reminder_bot = None
+                    proactive_bot = None
+                    
+                    # Find both reminder and proactive bots
+                    for bot in self.bot_registry.get_all_bots():
+                        if isinstance(bot, ReminderBot):
+                            reminder_bot = bot
+                        elif isinstance(bot, ProactiveBot):
+                            proactive_bot = bot
+                    
+                    for task in tasks:
+                        if reminder_bot:
+                            # Create a reminder for the task
+                            reminder_response = await reminder_bot.process_message(
+                                user_id=user_id,
+                                message=f"Remind me to {task['text']} at {task['deadline'].isoformat()}",
+                                context=context
+                            )
+                            if reminder_response.get("scheduled_notifications"):
+                                scheduled_notifications.extend(reminder_response["scheduled_notifications"])
+                        
+                        if proactive_bot:
+                            # Schedule follow-ups for the task
+                            deadline = task['deadline']
+                            time_until_deadline = (deadline - datetime.now()).total_seconds() / 60
+                            
+                            # Schedule an initial reminder at halfway to deadline if more than 30 minutes
+                            if time_until_deadline > 30:
+                                halfway_time = datetime.now() + timedelta(minutes=time_until_deadline/2)
+                                await self.task_scheduler.schedule_task(
+                                    task_type="task_followup",
+                                    bot_id="proactive_bot",
+                                    user_id=user_id,
+                                    execute_at=halfway_time,
+                                    params={
+                                        "task_text": task['text'],
+                                        "deadline": deadline.isoformat(),
+                                        "status": "pending"
+                                    }
+                                )
+                            
+                            # Schedule the deadline check
+                            await self.task_scheduler.schedule_task(
+                                task_type="task_followup",
+                                bot_id="proactive_bot",
+                                user_id=user_id,
+                                execute_at=deadline,
+                                params={
+                                    "task_text": task['text'],
+                                    "deadline": deadline.isoformat(),
+                                    "status": "overdue"
+                                }
+                            )
                 
-                return {
-                    "response": response,
-                    "conversation_id": conversation_id,
-                    "message_id": response_id,
-                    "parent_id": message_id
-                }
             except Exception as e:
                 self.logger.error(f"Error using LLM for general conversation: {str(e)}", exc_info=True)
                 
@@ -136,7 +212,7 @@ class CentralController:
                 response = await bot.process_message(user_id, message, context)
                 self.logger.info(f"Bot {bot.id} response: {str(response)[:200]}...")
                 
-                # Collect response data
+                # Collect response data if the bot provided one
                 if response.get("response"):
                     bot_responses.append({
                         "bot_id": bot.id,
@@ -164,8 +240,11 @@ class CentralController:
                 self.logger.error(f"Error processing message with bot {bot.id}: {str(e)}", exc_info=True)
                 # Don't let one bot failure prevent others from processing
         
-        # Combine responses from bots
-        combined_response = self.combine_responses(bot_responses)
+        # If we have bot responses, combine them, otherwise use the LLM response
+        if bot_responses:
+            combined_response = self.combine_responses(bot_responses)
+        elif not combined_response:  # If we don't have an LLM response yet
+            combined_response = await self.llm_client.generate_response([{"role": "user", "content": message}], context)
         
         # Store assistant response
         response_id, _ = await self.database.store_message(
