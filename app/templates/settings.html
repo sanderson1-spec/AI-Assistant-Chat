@@ -155,6 +155,106 @@
     <div class="settings-container">
         <h1>AI Assistant Settings</h1>
         
+        <!-- Character Management Section -->
+        <section class="character-section">
+            <h2>Character Management</h2>
+            
+            <!-- Character List -->
+            <div class="character-list">
+                <h3>Your Characters</h3>
+                <div id="character-list-container"></div>
+            </div>
+            
+            <!-- Character Creation/Edit Form -->
+            <div class="character-form">
+                <h3>Create/Edit Character</h3>
+                <form id="character-form">
+                    <div class="form-group">
+                        <label for="char-name">Name</label>
+                        <input type="text" id="char-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="char-backstory">Backstory</label>
+                        <textarea id="char-backstory" rows="4" placeholder="Write your character's background story, history, and key life events..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="char-speech">Speech Style</label>
+                        <textarea id="char-speech" rows="3" placeholder="Describe how your character talks, their tone, vocabulary level, quirks..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Personality Traits</label>
+                        <div id="personality-traits">
+                            <div class="trait-entry">
+                                <input type="text" placeholder="Trait name" class="trait-name">
+                                <input type="range" min="0" max="100" value="50" class="trait-value">
+                                <button type="button" class="remove-trait">×</button>
+                            </div>
+                        </div>
+                        <button type="button" id="add-trait">Add Trait</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Knowledge & Expertise</label>
+                        <div id="knowledge-domains">
+                            <input type="text" class="knowledge-tag" placeholder="Add domain and press Enter">
+                        </div>
+                        <small>Press Enter to add each knowledge domain</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Behavioral Settings</label>
+                        <div class="behavior-settings">
+                            <label>
+                                <input type="checkbox" id="learns-from-conversation">
+                                Learn and adapt from conversations
+                            </label>
+                            <label>
+                                <input type="checkbox" id="remembers-context">
+                                Remember conversation context
+                            </label>
+                            <label>
+                                <input type="checkbox" id="uses-memories">
+                                Use long-term memories
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" id="save-character">Save Character</button>
+                        <button type="button" id="reset-form">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+        
+        <!-- Memory Management Section -->
+        <section class="memory-section">
+            <h2>Memory Management</h2>
+            <div class="memory-settings">
+                <div class="form-group">
+                    <label>Memory Retention</label>
+                    <select id="memory-retention">
+                        <option value="short">Short (1 week)</option>
+                        <option value="medium">Medium (1 month)</option>
+                        <option value="long">Long (6 months)</option>
+                        <option value="permanent">Permanent</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Memory Consolidation</label>
+                    <select id="consolidation-frequency">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+        
         <div class="settings-section">
             <h2>Personality Management</h2>
             <div class="setting-item">

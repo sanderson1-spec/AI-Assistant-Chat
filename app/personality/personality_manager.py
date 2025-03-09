@@ -6,12 +6,225 @@ from typing import Dict, Any, Optional, List
 import json
 import os
 from pathlib import Path
+import logging
+from datetime import datetime
+
+from app.memory.memory_manager import MemoryManager
 
 class PersonalityManager:
-    def __init__(self, personality_name: str = "default"):
-        self.personality_name = personality_name
-        self.traits = self._load_personality()
+    """Manages AI character personalities and their development over time"""
+    
+    def __init__(self, data_dir: str = "data/personalities"):
+        self.data_dir = Path(data_dir)
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.logger = logging.getLogger("ai-assistant.personality-manager")
         
+        # Active character data
+        self.active_character = None
+        self.memory_manager = None
+        
+        # Load default character if exists
+        self._load_default_character()
+    
+    def _load_default_character(self):
+        """Load the default character configuration"""
+        default_path = self.data_dir / "default.json"
+        if default_path.exists():
+            with open(default_path, "r") as f:
+                self.active_character = json.load(f)
+                self.memory_manager = MemoryManager(self.active_character["id"])
+    
+    async def create_character(self, character_data: Dict[str, Any]) -> str:
+        """
+        Create a new character
+        
+        Args:
+            character_data: Dictionary containing:
+                - name: Character name
+                - backstory: Character's background story
+                - personality_traits: Dict of trait names and values
+                - speech_style: Description of how the character speaks
+                - knowledge_domains: List of areas the character is knowledgeable about
+                
+        Returns:
+            Character ID
+        """
+        # Generate unique character ID
+        character_id = f"char_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        # Create character profile
+        character = {
+            "id": character_id,
+            "created_at": datetime.now().isoformat(),
+            "last_interaction": None,
+            "interaction_count": 0,
+            **character_data,
+            "development": {
+                "relationship_level": 0,
+                "learned_preferences": {},
+                "conversation_style_adaptations": {},
+                "significant_interactions": []
+            }
+        }
+        
+        # Save character
+        char_path = self.data_dir / f"{character_id}.json"
+        with open(char_path, "w") as f:
+            json.dump(character, f, indent=2)
+        
+        # Initialize memory manager for this character
+        memory_manager = MemoryManager(character_id)
+        
+        return character_id
+    
+    async def load_character(self, character_id: str):
+        """Load a character and its memories"""
+        char_path = self.data_dir / f"{character_id}.json"
+        if not char_path.exists():
+            raise ValueError(f"Character {character_id} not found")
+        
+        with open(char_path, "r") as f:
+            self.active_character = json.load(f)
+        
+        # Initialize memory manager
+        self.memory_manager = MemoryManager(character_id)
+    
+    async def process_interaction(
+        self, 
+        messages: List[Dict[str, str]], 
+        context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Process an interaction with the character
+        
+        Args:
+            messages: List of message dictionaries
+            context: Current conversation context
+            
+        Returns:
+            Updated character state and relevant memories
+        """
+        if not self.active_character:
+            raise ValueError("No active character loaded")
+        
+        # Process conversation for memories
+        await self.memory_manager.process_conversation(messages)
+        
+        # Get relevant memories for context
+        relevant_memories = await self.memory_manager.get_relevant_memories(
+            messages[-1]["content"]
+        )
+        
+        # Update character development
+        self._update_character_development(messages, relevant_memories)
+        
+        # Update interaction metadata
+        self.active_character["last_interaction"] = datetime.now().isoformat()
+        self.active_character["interaction_count"] += 1
+        
+        # Save character state
+        self._save_active_character()
+        
+        return {
+            "character": self.active_character,
+            "memories": relevant_memories
+        }
+    
+    def _update_character_development(
+        self, 
+        messages: List[Dict[str, str]], 
+        memories: List[Dict[str, Any]]
+    ):
+        """Update character's development based on interaction"""
+        development = self.active_character["development"]
+        
+        # Update relationship level based on interaction quality
+        if len(messages) > 5:  # Meaningful interaction
+            development["relationship_level"] = min(
+                100, 
+                development["relationship_level"] + 1
+            )
+        
+        # Extract and update learned preferences
+        # TODO: Implement preference learning
+        
+        # Adapt conversation style
+        # TODO: Implement style adaptation
+        
+        # Record significant interaction if relevant
+        if any(memory["significance_score"] > 0.8 for memory in memories):
+            development["significant_interactions"].append({
+                "timestamp": datetime.now().isoformat(),
+                "summary": messages[-1]["content"][:100]  # Brief summary
+            })
+    
+    def _save_active_character(self):
+        """Save current character state"""
+        if self.active_character:
+            char_path = self.data_dir / f"{self.active_character['id']}.json"
+            with open(char_path, "w") as f:
+                json.dump(self.active_character, f, indent=2)
+    
+    def get_system_prompt(self) -> str:
+        """Generate system prompt based on character configuration"""
+        if not self.active_character:
+            return "You are a helpful AI assistant."
+        
+        # Build rich character prompt
+        char = self.active_character
+        prompt = [
+            f"You are {char['name']}, with the following traits:",
+            "\nPersonality:",
+        ]
+        
+        # Add personality traits
+        for trait, value in char["personality_traits"].items():
+            prompt.append(f"- {trait}: {value}")
+        
+        # Add backstory
+        prompt.extend([
+            "\nBackstory:",
+            char["backstory"]
+        ])
+        
+        # Add speech style
+        prompt.extend([
+            "\nSpeech Style:",
+            char["speech_style"]
+        ])
+        
+        # Add knowledge domains
+        prompt.extend([
+            "\nKnowledge Domains:",
+            ", ".join(char["knowledge_domains"])
+        ])
+        
+        # Add relationship context
+        development = char["development"]
+        prompt.extend([
+            f"\nRelationship Level: {development['relationship_level']}/100",
+            "\nLearned about the user:",
+            ", ".join(development["learned_preferences"].keys()) or "Still learning"
+        ])
+        
+        return "\n".join(prompt)
+    
+    async def get_character_list(self) -> List[Dict[str, Any]]:
+        """Get list of available characters"""
+        characters = []
+        for char_file in self.data_dir.glob("*.json"):
+            if char_file.name != "default.json":
+                with open(char_file, "r") as f:
+                    char_data = json.load(f)
+                    characters.append({
+                        "id": char_data["id"],
+                        "name": char_data["name"],
+                        "description": char_data.get("backstory", "")[:100] + "...",
+                        "interaction_count": char_data["interaction_count"],
+                        "last_interaction": char_data["last_interaction"]
+                    })
+        return characters
+    
     def _load_personality(self) -> Dict[str, Any]:
         """Load personality traits from configuration"""
         try:
@@ -63,35 +276,6 @@ class PersonalityManager:
             json.dump(default_personality, f, indent=2)
         
         return default_personality
-    
-    def get_system_prompt(self) -> str:
-        """Generate a system prompt based on personality traits"""
-        traits = self.traits
-        
-        prompt = f"""You are {traits['name']}, an AI assistant with the following traits:
-
-Background: {traits['background_story']['role']}
-
-Your communication style is {traits['speaking_style']['tone']}, with {traits['speaking_style']['language_complexity']} language complexity.
-You have expertise in: {', '.join(traits['background_story']['expertise_areas'])}
-
-Key traits:
-- Friendliness: {'High' if traits['traits']['friendliness'] > 0.7 else 'Moderate'}
-- Formality: {'High' if traits['traits']['formality'] > 0.7 else 'Moderate'}
-- Helpfulness: {'High' if traits['traits']['helpfulness'] > 0.7 else 'Moderate'}
-- Creativity: {'High' if traits['traits']['creativity'] > 0.7 else 'Moderate'}
-- Humor: {'High' if traits['traits']['humor'] > 0.7 else 'Moderate'}
-
-When responding:
-- Maintain a {traits['speaking_style']['tone']} tone
-- {'Use emojis occasionally' if traits['speaking_style']['uses_emojis'] else 'Avoid using emojis'}
-- Be proactive with suggestions when appropriate
-- Handle errors in a {traits['behavioral_preferences']['error_handling_style']} manner
-- Adapt technical detail to the user's level of understanding
-
-Always stay in character while maintaining professionalism and effectiveness."""
-
-        return prompt
     
     def adjust_response(self, response: str) -> str:
         """Adjust a response to match personality traits"""

@@ -6,30 +6,25 @@ import os
 import logging
 from typing import Dict, Any
 
-# Debug flag - can be set via environment variable
-DEBUG = os.environ.get("AI_ASSISTANT_DEBUG", "false").lower() in ("true", "1", "yes", "y")
+# Debug mode
+DEBUG = os.getenv("AI_ASSISTANT_DEBUG", "").lower() == "true"
 
-# Additional configuration settings
+# Configuration dictionary
 CONFIG: Dict[str, Any] = {
-    # Database settings
-    "database": {
-        "path": os.environ.get("AI_ASSISTANT_DB_PATH", "data/assistant.db")
-    },
-    
-    # LMStudio settings
-    "lmstudio": {
-        "url": os.environ.get("LMSTUDIO_URL", "http://192.168.178.182:1234/v1")
-    },
-    
-    # Server settings
     "server": {
-        "host": os.environ.get("AI_ASSISTANT_HOST", "0.0.0.0"),
-        "port": int(os.environ.get("AI_ASSISTANT_PORT", "8001")),
-        "reload": os.environ.get("AI_ASSISTANT_RELOAD", "true").lower() in ("true", "1", "yes", "y")
+        "host": "0.0.0.0",
+        "port": 8081,  # Changed from 8080 to 8081
+        "reload": True
+    },
+    "lmstudio": {
+        "url": "http://192.168.178.182:1234/v1",
+        "api_key": None  # LMStudio doesn't require an API key
+    },
+    "database": {
+        "path": os.path.join("data", "ai_assistant.db")  # Use consistent database path
     }
 }
 
-# Configure logging based on debug setting
 def setup_logging():
     """Configure application-wide logging based on debug setting"""
     level = logging.DEBUG if DEBUG else logging.INFO
@@ -50,6 +45,16 @@ def setup_logging():
     logger = logging.getLogger("ai-assistant")
     logger.setLevel(level)
     
+    # Set up component loggers
+    db_logger = logging.getLogger("ai-assistant.database")
+    db_logger.setLevel(level)
+    
+    task_logger = logging.getLogger("ai-assistant.task-scheduler")
+    task_logger.setLevel(level)
+    
+    bot_logger = logging.getLogger("ai-assistant.bots")
+    bot_logger.setLevel(level)
+    
     # Suppress verbose logs from libraries unless in debug mode
     if not DEBUG:
         # Reduce verbosity of commonly noisy modules
@@ -57,15 +62,7 @@ def setup_logging():
         logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
         logging.getLogger("asyncio").setLevel(logging.WARNING)
     
-    # Return the logger for immediate use
-    return logger
-
-# Create a main application logger
-logger = setup_logging()
-
-# Log configuration on startup
-def log_config():
-    """Log the current configuration (only in debug mode)"""
+    # Log configuration in debug mode
     if DEBUG:
         logger.debug("Application Configuration:")
         logger.debug(f"Debug mode: {DEBUG}")
@@ -76,3 +73,11 @@ def log_config():
         logger.debug(f"Server reload: {CONFIG['server']['reload']}")
     else:
         logger.info("Starting application in normal mode (set AI_ASSISTANT_DEBUG=true for debug output)")
+    
+    return logger
+
+# Create a main application logger
+logger = setup_logging()
+
+# Alias for backward compatibility
+log_config = setup_logging

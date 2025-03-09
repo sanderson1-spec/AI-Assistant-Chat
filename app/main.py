@@ -75,7 +75,7 @@ app = FastAPI(title="AI Assistant")
 
 # Set up static files and templates
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
-templates = Jinja2Templates(directory="app/static")
+templates = Jinja2Templates(directory="app/templates")
 
 # Create data directory if it doesn't exist
 os.makedirs("data", exist_ok=True)

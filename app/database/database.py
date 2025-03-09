@@ -528,6 +528,45 @@ class Database:
     
     # Task-related methods
     
+    async def get_all_tasks(self) -> List[Dict[str, Any]]:
+        """Get all tasks"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("""
+            SELECT id, user_id, bot_id, task_type, execute_at, params, recurring, interval, 
+                   last_executed_at, created_at
+            FROM tasks 
+            ORDER BY execute_at
+            """)
+            
+            tasks = cursor.fetchall()
+            
+            # Convert to list of dicts
+            result = []
+            for task in tasks:
+                task_dict = {
+                    'id': task[0],
+                    'user_id': task[1],
+                    'bot_id': task[2],
+                    'task_type': task[3],
+                    'execute_at': task[4],
+                    'params': task[5],
+                    'recurring': bool(task[6]),
+                    'interval': task[7],
+                    'last_executed_at': task[8],
+                    'created_at': task[9]
+                }
+                result.append(task_dict)
+            
+            return result
+        except Exception as e:
+            print(f"Error getting tasks: {e}")
+            return []
+        finally:
+            conn.close()
+    
     async def store_task(
         self, 
         task_id: str,
@@ -539,7 +578,7 @@ class Database:
         recurring: bool = False,
         interval: Optional[int] = None
     ) -> bool:
-        """Store a scheduled task in the database"""
+        """Store a task in the database"""
         conn = self.get_connection()
         cursor = conn.cursor()
         
@@ -547,7 +586,7 @@ class Database:
             created_at = datetime.utcnow().isoformat()
             
             cursor.execute("""
-            INSERT INTO tasks
+            INSERT OR REPLACE INTO tasks
             (id, user_id, bot_id, task_type, execute_at, params, recurring, interval, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
@@ -566,6 +605,41 @@ class Database:
             return True
         except Exception as e:
             print(f"Error storing task: {e}")
+            return False
+        finally:
+            conn.close()
+    
+    async def remove_task(self, task_id: str) -> bool:
+        """Remove a task from the database"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+            conn.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error removing task: {e}")
+            return False
+        finally:
+            conn.close()
+    
+    async def update_task_execution_time(self, task_id: str, execution_time: str) -> bool:
+        """Update the last execution time for a task"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("""
+            UPDATE tasks
+            SET last_executed_at = ?
+            WHERE id = ?
+            """, (execution_time, task_id))
+            
+            conn.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error updating task execution time: {e}")
             return False
         finally:
             conn.close()
@@ -593,67 +667,6 @@ class Database:
         task['recurring'] = bool(task['recurring'])
         
         return task
-    
-    async def update_task_execution_time(self, task_id: str, execution_time: str) -> bool:
-        """Update the last execution time for a task"""
-        conn = self.get_connection()
-        cursor = conn.cursor()
-        
-        try:
-            cursor.execute("""
-            UPDATE tasks
-            SET last_executed_at = ?
-            WHERE id = ?
-            """, (execution_time, task_id))
-            
-            conn.commit()
-            return cursor.rowcount > 0
-        except Exception as e:
-            print(f"Error updating task execution time: {e}")
-            return False
-        finally:
-            conn.close()
-    
-    async def remove_task(self, task_id: str) -> bool:
-        """Remove a task from the database"""
-        conn = self.get_connection()
-        cursor = conn.cursor()
-        
-        try:
-            cursor.execute("""
-            DELETE FROM tasks WHERE id = ?
-            """, (task_id,))
-            
-            conn.commit()
-            return cursor.rowcount > 0
-        except Exception as e:
-            print(f"Error removing task: {e}")
-            return False
-        finally:
-            conn.close()
-    
-    async def get_all_tasks(self) -> List[Dict[str, Any]]:
-        """Get all tasks"""
-        conn = self.get_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute("""
-        SELECT * FROM tasks ORDER BY execute_at
-        """)
-        
-        tasks = cursor.fetchall()
-        
-        # Convert to list of dicts
-        columns = [col[0] for col in cursor.description]
-        result = []
-        
-        for task_row in tasks:
-            task = dict(zip(columns, task_row))
-            task['recurring'] = bool(task['recurring'])
-            result.append(task)
-        
-        conn.close()
-        return result
     
     async def get_user_tasks(self, user_id: str) -> List[Dict[str, Any]]:
         """Get tasks for a specific user"""

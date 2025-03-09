@@ -3,7 +3,14 @@ import json
 import traceback
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
-import dateparser
+
+# Check if dateparser is available
+try:
+    import dateparser
+    DATEPARSER_AVAILABLE = True
+except ImportError:
+    DATEPARSER_AVAILABLE = False
+    print("Warning: dateparser not available. Task detection will be limited.")
 
 class LMStudioClient:
     """Client for interacting with locally hosted LMStudio"""
@@ -29,7 +36,28 @@ class LMStudioClient:
             system_prompt = self.personality_manager.get_system_prompt()
             messages.insert(0, {"role": "system", "content": system_prompt})
         
-        # Add time context to the system message if available
+        # Process interaction to get memories if personality manager is available
+        if self.personality_manager and len(messages) > 0:
+            interaction_result = await self.personality_manager.process_interaction(
+                messages, context or {}
+            )
+            
+            # If we have relevant memories, add them to the context
+            if interaction_result["memories"]:
+                memory_context = "\nRelevant memories and context:\n"
+                for memory in interaction_result["memories"]:
+                    memory_context += f"- {memory['content']}\n"
+                
+                # Add memories to system message
+                if messages[0]["role"] == "system":
+                    messages[0]["content"] += "\n" + memory_context
+                else:
+                    messages.insert(0, {
+                        "role": "system",
+                        "content": memory_context
+                    })
+        
+        # Add time context if available
         if context and 'time_context' in context:
             time_context_str = (
                 "Current Time Context:\n"

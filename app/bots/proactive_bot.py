@@ -51,6 +51,17 @@ class ProactiveBot(BaseBot):
         logger.warning(f"Unknown task type: {task_type}")
         return {"success": False, "error": "Unknown task type"}
     
+    async def get_conversation_context(self, conversation_id: str) -> Dict[str, Any]:
+        """Get conversation context from the database"""
+        try:
+            context = await self.database.get_conversation_context(conversation_id)
+            if not context:
+                context = {}
+            return context
+        except Exception as e:
+            logger.error(f"Error getting conversation context: {str(e)}", exc_info=True)
+            return {}
+    
     async def _handle_proactive_message(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Generate and send a proactive message based on conversation history"""
         user_id = params.get("user_id")
