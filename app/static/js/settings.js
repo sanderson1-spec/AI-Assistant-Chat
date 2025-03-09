@@ -107,6 +107,8 @@ function createCharacterCard(character) {
 
 async function loadCharacterDetails(character) {
     try {
+        console.log('Loading character details:', character);
+        
         // Get all required elements
         const elements = {
             name: document.getElementById('char-name'),
@@ -128,6 +130,11 @@ async function loadCharacterDetails(character) {
         if (missingElements.length > 0) {
             throw new Error(`Missing required elements: ${missingElements.join(', ')}`);
         }
+        
+        // Store the character ID as a data attribute on the form for later retrieval
+        const form = document.getElementById('character-form');
+        form.dataset.characterId = character.id || '';
+        console.log(`Stored character ID in form: ${form.dataset.characterId}`);
         
         // Update form with character details
         elements.name.value = character.name;
@@ -216,6 +223,40 @@ function setupEventListeners() {
             }
         });
         
+        // New save and return button
+        const saveAndReturnBtn = document.getElementById('save-and-return');
+        if (saveAndReturnBtn) {
+            saveAndReturnBtn.addEventListener('click', async () => {
+                try {
+                    const selectedName = document.getElementById('active-character').value;
+                    
+                    // Save the active character setting
+                    if (selectedName) {
+                        localStorage.setItem('activeCharacter', selectedName);
+                        
+                        // Notify the server about the active character change
+                        await fetch('/api/active-character', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ name: selectedName })
+                        });
+                        
+                        showMessage('Character activated successfully!', 'success');
+                    }
+                    
+                    // Return to the main chat page
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 500); // Short delay to let the user see the success message
+                } catch (error) {
+                    console.error('Error setting active character:', error);
+                    showMessage('Error setting active character: ' + error.message, 'error');
+                }
+            });
+        }
+        
         // New character button
         const newCharacterBtn = document.getElementById('new-character-btn');
         if (!newCharacterBtn) {
@@ -223,6 +264,7 @@ function setupEventListeners() {
         }
         
         newCharacterBtn.addEventListener('click', () => {
+            console.log('Creating new character - resetting form');
             resetForm();
             // Clear active character selection when creating new
             activeCharacterSelect.value = '';
@@ -290,6 +332,8 @@ function addSampleMessageField(message = '') {
 }
 
 function resetForm() {
+    console.log('Resetting character form');
+    
     document.getElementById('char-name').value = '';
     document.getElementById('char-description').value = '';
     document.getElementById('char-definition').value = '';
@@ -303,10 +347,19 @@ function resetForm() {
     document.querySelectorAll('.character-card').forEach(card => {
         card.classList.remove('selected');
     });
+    
+    // Clear the character ID so we create a new character rather than updating
+    const form = document.getElementById('character-form');
+    form.dataset.characterId = '';
+    console.log('Cleared character ID from form');
 }
 
 async function getCurrentCharacter() {
+    // Get the character ID from the form's data attribute
+    const characterId = document.getElementById('character-form').dataset.characterId || '';
+    
     return {
+        id: characterId, // Include the character ID to indicate this is an update, not a new character
         name: document.getElementById('char-name').value,
         description: document.getElementById('char-description').value,
         definition: document.getElementById('char-definition').value,
@@ -323,10 +376,18 @@ async function getCurrentCharacter() {
 
 async function saveCharacter() {
     const character = await getCurrentCharacter();
-    console.log('Saving character:', character);
+    console.log('Saving character with data:', character);
     
     try {
         console.log('Sending POST request to /api/characters');
+        
+        // Ensure the ID is properly included for updates
+        if (character.id) {
+            console.log(`This is an update to existing character with ID: ${character.id}`);
+        } else {
+            console.log('This is a new character creation (no ID provided)');
+        }
+        
         const response = await fetch('/api/characters', {
             method: 'POST',
             headers: {
@@ -343,6 +404,11 @@ async function saveCharacter() {
         
         const result = await response.json();
         console.log('Character saved successfully:', result);
+        
+        // Store the returned ID back to the form for future updates
+        const form = document.getElementById('character-form');
+        form.dataset.characterId = result.id || '';
+        console.log(`Updated form with saved character ID: ${form.dataset.characterId}`);
         
         // Refresh the character list
         await loadCharacters();

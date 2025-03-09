@@ -15,6 +15,8 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional
 from app.bots.chat_bot import ChatBot
 from pathlib import Path
+import re
+import sqlite3
 
 # Configure root logger
 logging.basicConfig(
@@ -473,42 +475,59 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                     # We need to regenerate the response for this edited message
                     # For simplicity in the WebSocket case, we'll just get a new response
                     message_id = edit_message_id
+                    # Process with the Central Controller but skip storing the message again
+                    try:
+                        response = await controller.process_message(user_id, message, conversation_id, message_id)
+                        
+                        # Send response back to client
+                        await manager.send_message(client_id, {
+                            "type": "message",
+                            "conversation_id": response["conversation_id"],
+                            "content": response["response"],
+                            "role": "assistant",
+                            "id": response["message_id"],
+                            "parent_id": response["parent_id"],
+                            "edit_message_id": edit_message_id  # Pass back the edit ID if this was an edit
+                        })
+                    except Exception as e:
+                        logger.error(f"Error processing message: {str(e)}", exc_info=True)
+                        # Send error response to client
+                        await manager.send_message(client_id, {
+                            "type": "message",
+                            "conversation_id": conversation_id,
+                            "content": "I'm sorry, I encountered an error processing your message. Please try again.",
+                            "role": "assistant",
+                            "id": 0,  # Temporary ID
+                            "parent_id": message_id,
+                            "edit_message_id": edit_message_id
+                        })
                 else:
-                    # Store user message
-                    message_id, conv_id = await db.store_message(
-                        user_id, 
-                        message, 
-                        "user", 
-                        conversation_id
-                    )
-                    conversation_id = conv_id
-                
-                # Process with the Central Controller
-                try:
-                    response = await controller.process_message(user_id, message, conversation_id)
-                    
-                    # Send response back to client
-                    await manager.send_message(client_id, {
-                        "type": "message",
-                        "conversation_id": response["conversation_id"],
-                        "content": response["response"],
-                        "role": "assistant",
-                        "id": response["message_id"],
-                        "parent_id": response["parent_id"],
-                        "edit_message_id": edit_message_id  # Pass back the edit ID if this was an edit
-                    })
-                except Exception as e:
-                    logger.error(f"Error processing message: {str(e)}", exc_info=True)
-                    # Send error response to client
-                    await manager.send_message(client_id, {
-                        "type": "message",
-                        "conversation_id": conversation_id,
-                        "content": "I'm sorry, I encountered an error processing your message. Please try again.",
-                        "role": "assistant",
-                        "id": 0,  # Temporary ID
-                        "parent_id": message_id,
-                        "edit_message_id": edit_message_id
-                    })
+                    # Process with the Central Controller - the message will be stored there
+                    try:
+                        response = await controller.process_message(user_id, message, conversation_id)
+                        
+                        # Send response back to client
+                        await manager.send_message(client_id, {
+                            "type": "message",
+                            "conversation_id": response["conversation_id"],
+                            "content": response["response"],
+                            "role": "assistant",
+                            "id": response["message_id"],
+                            "parent_id": response["parent_id"],
+                            "edit_message_id": None
+                        })
+                    except Exception as e:
+                        logger.error(f"Error processing message: {str(e)}", exc_info=True)
+                        # Send error response to client
+                        await manager.send_message(client_id, {
+                            "type": "message",
+                            "conversation_id": conversation_id,
+                            "content": "I'm sorry, I encountered an error processing your message. Please try again.",
+                            "role": "assistant",
+                            "id": 0,  # Temporary ID
+                            "parent_id": 0,  # Unknown parent ID
+                            "edit_message_id": None
+                        })
             
             elif message_type == "notification_read":
                 # Mark notification as read
@@ -598,12 +617,82 @@ async def create_or_update_character(character: Dict[str, Any]):
     """Create or update a character"""
     try:
         print(f"Received character data: {json.dumps(character, indent=2)}")
-        # Create new character
-        character_id = await personality_manager.create_character(character)
-        print(f"Character created with ID: {character_id}")
-        return {"status": "success", "id": character_id}
+        
+        # First, check if this is an update to an existing character
+        if character.get("id"):
+            character_id = character["id"]
+            char_path = Path("data/personalities") / f"{character_id}.json"
+            
+            # Check if the file exists
+            if char_path.exists():
+                # Update existing character
+                with open(char_path, "r") as f:
+                    existing_character = json.load(f)
+                
+                # Update the fields but preserve important system fields
+                existing_character.update({
+                    "name": character["name"],
+                    "description": character.get("description", ""),
+                    "definition": character.get("definition", ""),
+                    "sample_messages": character.get("sample_messages", []),
+                    "behavioral_settings": character.get("behavioral_settings", {})
+                })
+                
+                # Save the updated character
+                with open(char_path, "w") as f:
+                    json.dump(existing_character, f, indent=2)
+                
+                print(f"Character updated with ID: {character_id}")
+                return {"status": "success", "id": character_id}
+        
+        # If we reach here, either the ID wasn't provided or the file wasn't found
+        # Let's check if a character with this name already exists
+        
+        try:
+            characters = await personality_manager.get_character_list()
+            existing_character = next((c for c in characters if c["name"] == character["name"]), None)
+            
+            if existing_character:
+                # Found a character with the same name, update its file
+                character_id = existing_character["id"]
+                char_path = Path("data/personalities") / f"{character_id}.json"
+                
+                if char_path.exists():
+                    # Load the complete character data
+                    with open(char_path, "r") as f:
+                        full_character_data = json.load(f)
+                    
+                    # Update only the editable fields
+                    full_character_data.update({
+                        "name": character["name"],
+                        "description": character.get("description", ""),
+                        "definition": character.get("definition", ""),
+                        "sample_messages": character.get("sample_messages", []),
+                        "behavioral_settings": character.get("behavioral_settings", {})
+                    })
+                    
+                    # Save the updated character
+                    with open(char_path, "w") as f:
+                        json.dump(full_character_data, f, indent=2)
+                    
+                    print(f"Character updated by name with ID: {character_id}")
+                    return {"status": "success", "id": character_id}
+            
+            # If we reach here, we need to create a new character
+            # Ensure we pass on the ID if it was provided
+            character_id = await personality_manager.create_character(character)
+            print(f"New character created with ID: {character_id}")
+            return {"status": "success", "id": character_id}
+            
+        except Exception as e:
+            print(f"Error checking for existing character: {str(e)}")
+            # Fall back to creating a new character
+            character_id = await personality_manager.create_character(character)
+            print(f"New character created with ID: {character_id}")
+            return {"status": "success", "id": character_id}
+            
     except Exception as e:
-        print(f"Error creating character: {str(e)}")
+        print(f"Error creating/updating character: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/characters/{name}")
@@ -645,6 +734,251 @@ async def set_active_character(data: Dict[str, Any]):
     except HTTPException:
         raise
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Database Admin routes
+@app.get("/db-admin")
+async def db_admin_page(request: Request):
+    """Database admin page"""
+    return templates.TemplateResponse("db_admin.html", {"request": request})
+
+@app.get("/api/db/tables")
+async def get_db_tables():
+    """Get list of database tables"""
+    try:
+        conn = db.get_connection()
+        cursor = conn.cursor()
+        
+        # Query for table names
+        cursor.execute("""
+        SELECT name FROM sqlite_master 
+        WHERE type='table' 
+        ORDER BY name
+        """)
+        
+        tables = [row[0] for row in cursor.fetchall()]
+        conn.close()
+        
+        return {"tables": tables}
+    except Exception as e:
+        logger.error(f"Error getting database tables: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/db/table/{table_name}")
+async def get_table_data(table_name: str, limit: int = 1000, offset: int = 0):
+    """Get data from a specific table"""
+    try:
+        # Security check: validate table name (basic protection against SQL injection)
+        valid_table_pattern = re.compile(r'^[a-zA-Z0-9_]+$')
+        if not valid_table_pattern.match(table_name):
+            raise HTTPException(status_code=400, detail="Invalid table name")
+        
+        conn = db.get_connection()
+        cursor = conn.cursor()
+        
+        # Get table info
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        columns_info = cursor.fetchall()
+        columns = [column[1] for column in columns_info]
+        
+        # Query for rows with pagination
+        cursor.execute(f"SELECT * FROM {table_name} LIMIT ? OFFSET ?", (limit, offset))
+        rows_data = cursor.fetchall()
+        
+        # Convert to list of dictionaries
+        rows = []
+        for row in rows_data:
+            row_dict = {}
+            for i, column in enumerate(columns):
+                row_dict[column] = row[i]
+            rows.append(row_dict)
+        
+        conn.close()
+        
+        return {
+            "columns": columns,
+            "rows": rows,
+            "total": len(rows),  # This is not the total in the table, just in this query
+            "table": table_name
+        }
+    except Exception as e:
+        logger.error(f"Error getting data for table {table_name}: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/db/table/{table_name}")
+async def create_record(table_name: str, record: Dict[str, Any]):
+    """Create a new record in the specified table"""
+    try:
+        # Security check: validate table name
+        valid_table_pattern = re.compile(r'^[a-zA-Z0-9_]+$')
+        if not valid_table_pattern.match(table_name):
+            raise HTTPException(status_code=400, detail="Invalid table name")
+        
+        # Get column information to validate record fields
+        conn = db.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        columns_info = cursor.fetchall()
+        columns = [column[1] for column in columns_info]
+        
+        # Filter out any fields that don't exist in the table
+        valid_fields = {field: value for field, value in record.items() if field in columns}
+        
+        if not valid_fields:
+            raise HTTPException(status_code=400, detail="No valid fields provided")
+        
+        # Construct the SQL query
+        fields = ', '.join(valid_fields.keys())
+        placeholders = ', '.join(['?' for _ in valid_fields])
+        
+        # Add timestamp for created_at if it exists and not provided
+        if 'created_at' in columns and 'created_at' not in valid_fields:
+            fields += ', created_at'
+            placeholders += ', ?'
+            valid_fields['created_at'] = datetime.now().isoformat()
+            
+        # Add timestamp for updated_at if it exists and not provided
+        if 'updated_at' in columns and 'updated_at' not in valid_fields:
+            fields += ', updated_at'
+            placeholders += ', ?'
+            valid_fields['updated_at'] = datetime.now().isoformat()
+            
+        # Execute the insert
+        try:
+            cursor.execute(
+                f"INSERT INTO {table_name} ({fields}) VALUES ({placeholders})",
+                list(valid_fields.values())
+            )
+            conn.commit()
+            
+            # Get the ID of the inserted record
+            last_id = cursor.lastrowid
+            
+            conn.close()
+            return {"status": "success", "id": last_id}
+            
+        except sqlite3.Error as e:
+            conn.rollback()
+            conn.close()
+            raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating record in {table_name}: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/db/table/{table_name}/{record_id}")
+async def update_record(table_name: str, record_id: str, record: Dict[str, Any]):
+    """Update an existing record in the specified table"""
+    try:
+        # Security check: validate table name
+        valid_table_pattern = re.compile(r'^[a-zA-Z0-9_]+$')
+        if not valid_table_pattern.match(table_name):
+            raise HTTPException(status_code=400, detail="Invalid table name")
+        
+        # Get column information
+        conn = db.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        columns_info = cursor.fetchall()
+        columns = [column[1] for column in columns_info]
+        
+        # Determine primary key column
+        primary_key_column = 'id'  # Default
+        for column_info in columns_info:
+            if column_info[5] == 1:  # 5 is the index for "pk" in the PRAGMA result
+                primary_key_column = column_info[1]
+                break
+        
+        # Filter out any fields that don't exist in the table
+        valid_fields = {field: value for field, value in record.items() if field in columns}
+        
+        if not valid_fields:
+            raise HTTPException(status_code=400, detail="No valid fields provided")
+        
+        # Add timestamp for updated_at if it exists
+        if 'updated_at' in columns:
+            valid_fields['updated_at'] = datetime.now().isoformat()
+        
+        # Construct the SQL query
+        set_clause = ', '.join([f"{field} = ?" for field in valid_fields.keys()])
+        
+        # Execute the update
+        try:
+            cursor.execute(
+                f"UPDATE {table_name} SET {set_clause} WHERE {primary_key_column} = ?",
+                list(valid_fields.values()) + [record_id]
+            )
+            conn.commit()
+            
+            if cursor.rowcount == 0:
+                conn.close()
+                raise HTTPException(status_code=404, detail=f"Record with {primary_key_column}={record_id} not found")
+            
+            conn.close()
+            return {"status": "success", "rows_updated": cursor.rowcount}
+            
+        except sqlite3.Error as e:
+            conn.rollback()
+            conn.close()
+            raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating record in {table_name}: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/db/table/{table_name}/{record_id}")
+async def delete_record(table_name: str, record_id: str):
+    """Delete a record from the specified table"""
+    try:
+        # Security check: validate table name
+        valid_table_pattern = re.compile(r'^[a-zA-Z0-9_]+$')
+        if not valid_table_pattern.match(table_name):
+            raise HTTPException(status_code=400, detail="Invalid table name")
+        
+        # Get column information to determine the primary key
+        conn = db.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        columns_info = cursor.fetchall()
+        
+        # Determine primary key column
+        primary_key_column = 'id'  # Default
+        for column_info in columns_info:
+            if column_info[5] == 1:  # 5 is the index for "pk" in the PRAGMA result
+                primary_key_column = column_info[1]
+                break
+        
+        # Execute the delete
+        try:
+            cursor.execute(
+                f"DELETE FROM {table_name} WHERE {primary_key_column} = ?",
+                [record_id]
+            )
+            conn.commit()
+            
+            if cursor.rowcount == 0:
+                conn.close()
+                raise HTTPException(status_code=404, detail=f"Record with {primary_key_column}={record_id} not found")
+            
+            conn.close()
+            return {"status": "success", "rows_deleted": cursor.rowcount}
+            
+        except sqlite3.Error as e:
+            conn.rollback()
+            conn.close()
+            raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting record from {table_name}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

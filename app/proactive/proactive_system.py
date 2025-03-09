@@ -132,7 +132,7 @@ class ProactiveSystem:
         ]
         
         # Add personality context
-        for trait, value in character["personality_traits"].items():
+        for trait, value in character["traits"].items():
             prompt.append(f"- {trait}: {value}")
         
         # Add time context

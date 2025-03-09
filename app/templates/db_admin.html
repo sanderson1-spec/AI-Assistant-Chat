@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Admin - AI Assistant</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .admin-section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .table-selector {
+            margin-bottom: 20px;
+        }
+
+        .table-selector select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            min-width: 200px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .data-table th, .data-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .data-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-section input, .filter-section select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .filter-section button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .filter-section button:hover {
+            background-color: #0069d9;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .pagination button {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pagination button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .pagination button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .data-cell-content {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .data-cell-content.expanded {
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .back-button {
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+            text-decoration: none;
+        }
+
+        /* Add Button */
+        .add-button {
+            background-color: #28a745;
+            color: white;
+            margin-left: auto;
+        }
+        
+        /* Action buttons in table rows */
+        .action-cell {
+            white-space: nowrap;
+        }
+        
+        .row-action-button {
+            padding: 4px 8px;
+            margin: 0 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .edit-button {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 0;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 60%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 600px;
+        }
+        
+        .confirm-content {
+            max-width: 400px;
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+        
+        /* Form styles */
+        .form-field {
+            margin-bottom: 15px;
+        }
+        
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-field input, 
+        .form-field textarea,
+        .form-field select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .form-field textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .form-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .form-actions button[type="submit"],
+        #confirm-yes {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .form-actions button[type="button"],
+        #confirm-no {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Database Admin</h1>
+            <a href="/" class="back-button">Back to Chat</a>
+        </div>
+
+        <div class="admin-section">
+            <h2>Database Explorer</h2>
+            <p>View and explore the database tables below.</p>
+
+            <div class="table-selector">
+                <label for="table-select">Select a table:</label>
+                <select id="table-select">
+                    <option value="">-- Select a table --</option>
+                    <!-- Table options will be populated by JavaScript -->
+                </select>
+            </div>
+
+            <div class="filter-section">
+                <input type="text" id="search-filter" placeholder="Search..." style="display: none;">
+                <select id="column-filter" style="display: none;">
+                    <option value="">-- Select column --</option>
+                    <!-- Column options will be populated by JavaScript -->
+                </select>
+                <button id="apply-filter" style="display: none;">Apply Filter</button>
+                <button id="clear-filter" style="display: none;">Clear</button>
+                <button id="add-record-button" class="add-button" style="display: none;">Add New Record</button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table" id="data-table">
+                    <thead>
+                        <tr id="table-headers">
+                            <!-- Table headers will be populated by JavaScript -->
+                        </tr>
+                    </thead>
+                    <tbody id="table-data">
+                        <!-- Table data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <!-- Pagination controls will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Record -->
+    <div id="record-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Add Record</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="record-form">
+                    <div id="form-fields">
+                        <!-- Form fields will be generated dynamically -->
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" id="save-record-btn">Save</button>
+                        <button type="button" id="cancel-record-btn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirm-dialog" class="modal">
+        <div class="modal-content confirm-content">
+            <div class="modal-header">
+                <h2>Confirm Action</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">Are you sure you want to proceed?</p>
+                <div class="form-actions">
+                    <button id="confirm-yes">Yes</button>
+                    <button id="confirm-no">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/db-admin.js"></script>
+</body>
+</html> 

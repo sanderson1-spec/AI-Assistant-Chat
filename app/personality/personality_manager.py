@@ -78,6 +78,7 @@ class PersonalityManager:
                 - definition: Detailed character definition
                 - sample_messages: List of sample messages
                 - behavioral_settings: Dictionary of behavioral settings
+                - id (optional): Existing character ID for updates
                 
         Returns:
             Character ID
@@ -85,17 +86,22 @@ class PersonalityManager:
         self.logger.info(f"Creating new character with data: {json.dumps(character_data, indent=2)}")
         
         try:
-            # Use the character name as the base for the ID (sanitized)
-            base_name = "".join(c for c in character_data["name"] if c.isalnum())
-            character_id = base_name.lower()
-            
-            # If file already exists, append a number
-            counter = 1
-            while (self.data_dir / f"{character_id}.json").exists():
-                character_id = f"{base_name.lower()}_{counter}"
-                counter += 1
-            
-            self.logger.debug(f"Generated character ID: {character_id}")
+            # Check if an ID was provided (for updates)
+            if character_data.get("id"):
+                character_id = character_data["id"]
+                self.logger.debug(f"Using provided character ID: {character_id}")
+            else:
+                # Generate a new ID based on the character name
+                base_name = "".join(c for c in character_data["name"] if c.isalnum())
+                character_id = base_name.lower()
+                
+                # If file already exists, append a number
+                counter = 1
+                while (self.data_dir / f"{character_id}.json").exists():
+                    character_id = f"{base_name.lower()}_{counter}"
+                    counter += 1
+                
+                self.logger.debug(f"Generated character ID: {character_id}")
             
             # Create character profile
             character = {

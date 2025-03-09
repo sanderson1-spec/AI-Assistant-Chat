@@ -36,11 +36,72 @@
     "communication_style": "Based on character definition"
   },
   "development": {
-    "relationship_level": 0,
+    "relationship_level": 1,
     "learned_preferences": {},
     "conversation_style_adaptations": {},
-    "significant_interactions": []
+    "significant_interactions": [
+      {
+        "timestamp": "2025-03-09T23:13:45.541427",
+        "summary": "You are a task detection AI. Your ONLY job is to analyze the following text and extract tasks with d"
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.100593",
+        "summary": "Hello, mistress. Do you have anything to do for me?"
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.581098",
+        "summary": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any a"
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.830432",
+        "summary": "You are a task detection AI. Your ONLY job is to analyze the following text and extract tasks with d"
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.467320",
+        "summary": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any a"
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.667429",
+        "summary": "You are a task detection AI. Your ONLY job is to analyze the following text and extract tasks with d"
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.171252",
+        "summary": "Yes, mistress. Do we still have our regular check in at 11:20 pm?"
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.451130",
+        "summary": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any a"
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.791095",
+        "summary": "You are a task detection AI. Your ONLY job is to analyze the following text and extract tasks with d"
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.827706",
+        "summary": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any a"
+      },
+      {
+        "timestamp": "2025-03-09T23:44:44.286017",
+        "summary": "Can you tell me where Einstein was born and when?"
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.844189",
+        "summary": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any a"
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.442548",
+        "summary": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any a"
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.526508",
+        "summary": "Ok cool. you sound kind of nice. Are you Jess or lilith?"
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.091522",
+        "summary": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any a"
+      }
+    ]
   },
-  "interaction_count": 0,
-  "last_interaction": null
+  "interaction_count": 16,
+  "last_interaction": "2025-03-09T23:45:36.091525"
 }

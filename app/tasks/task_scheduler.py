@@ -152,10 +152,15 @@ class TaskScheduler:
                     try:
                         bot = self.bot_registry.get_bot(job["bot_id"])
                         if bot:
+                            # Parse params and ensure user_id is included
+                            params = json.loads(job["params"]) if isinstance(job["params"], str) else job["params"]
+                            # Make sure user_id is in params
+                            if "user_id" not in params and "user_id" in job:
+                                params["user_id"] = job["user_id"]
+                                
                             await bot.execute_task(
                                 task_type=job["task_type"],
-                                params=json.loads(job["params"]) if isinstance(job["params"], str) else job["params"],
-                                user_id=job["user_id"]
+                                params=params
                             )
                             # Update last execution time
                             await self.database.update_task_execution_time(
@@ -180,3 +185,77 @@ class TaskScheduler:
         if self._task:
             self._task.cancel()
         self._initialized = False
+
+    async def store_task(self, task_id, task_params):
+        """Store a task in the database and add it to the scheduler
+        
+        Parameters:
+        - task_id: Unique ID for the task
+        - task_params: Dictionary containing task parameters including:
+            - text: Task description
+            - user_id: User ID associated with the task
+            - deadline: Datetime when the task should be executed
+            - conversation_id: Optional conversation context
+        """
+        try:
+            # Extract required parameters
+            user_id = task_params.get('user_id')
+            text = task_params.get('text')
+            deadline = task_params.get('deadline')
+            conversation_id = task_params.get('conversation_id')
+            
+            if not all([user_id, text, deadline]):
+                self.logger.warning(f"Missing required parameters for task {task_id}: {task_params}")
+                return False
+            
+            # Convert deadline to string format if it's a datetime object
+            if isinstance(deadline, datetime):
+                execute_at = deadline.isoformat()
+            else:
+                execute_at = deadline
+                
+            # Determine which bot should handle the task
+            # For now, use reminder_bot for all tasks
+            bot_id = "reminder_bot"
+            task_type = "reminder_notification"
+            
+            # Prepare params for storage
+            params = {
+                "text": text,
+                "user_id": user_id,
+                "conversation_id": conversation_id
+            }
+            
+            # Store in database
+            stored = await self.database.store_task(
+                task_id=task_id,
+                user_id=user_id,
+                bot_id=bot_id,
+                task_type=task_type,
+                execute_at=execute_at,
+                params=json.dumps(params),
+                recurring=False,
+                interval=None
+            )
+            
+            if stored:
+                # Add to in-memory jobs
+                self.jobs[task_id] = {
+                    "id": task_id,
+                    "user_id": user_id,
+                    "bot_id": bot_id,
+                    "task_type": task_type,
+                    "execute_at": execute_at,
+                    "params": params,
+                    "recurring": False,
+                    "interval": None
+                }
+                self.logger.info(f"Task {task_id} stored successfully for execution at {execute_at}")
+                return True
+            else:
+                self.logger.error(f"Failed to store task {task_id} in database")
+                return False
+                
+        except Exception as e:
+            self.logger.error(f"Error storing task {task_id}: {str(e)}", exc_info=True)
+            return False

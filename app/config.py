@@ -13,11 +13,11 @@ DEBUG = os.getenv("AI_ASSISTANT_DEBUG", "").lower() == "true"
 CONFIG: Dict[str, Any] = {
     "server": {
         "host": "0.0.0.0",
-        "port": 8081,  # Changed from 8080 to 8081
+        "port": 8082,  # Changed from 8081 to 8082
         "reload": True
     },
     "lmstudio": {
-        "url": "http://192.168.178.182:1234/v1",
+        "url": "http://localhost:1234/v1",
         "api_key": None  # LMStudio doesn't require an API key
     },
     "database": {

@@ -1,6 +1,152 @@
 {
-  "critical_events": [],
-  "important_context": [],
+  "critical_events": [
+    {
+      "content": "You are a task detection AI. Your ONLY job is to analyze the following text and extract tasks with deadlines.\nIMPORTANT RULES:\n1. ONLY output a JSON array. NO other text.\n2. Each task MUST have \"text\" and \"deadline\" fields.\n3. If no tasks found, output empty array: []\n4. DO NOT explain what you're doing.\n5. DO NOT give examples.\n6. DO NOT include any text before or after the JSON array.\n7. DO NOT include any conversation or roleplay.\n8. ONLY output valid JSON that can be parsed by json.loads().\n9. ONLY extract tasks that are ACTUALLY mentioned in the text.\n10. DO NOT make up tasks or deadlines.\n11. DO NOT use example tasks from these instructions.\n12. The deadline MUST be a specific time/date mentioned in the text.\n13. If a task has no specific deadline in the text, do not include it.\n\nHere is the text to analyze (output ONLY a JSON array):\n{text}",
+      "timestamp": "2025-03-09T23:13:45.539151",
+      "significance_score": 0.9513942433595657,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9995705485343933
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any action items, tasks, planned events, meetings, or deadlines?\n        \n        Text: Yes, my obedient slave. I have a task in store for you. You must obey me without question and complete the task as instructed. If you fail, there will be consequences.\n\nYour task is to fetch me a specific book from the library. The book is called \"The Art of Seduction\" by Robert Greene. It's a rare edition, so you'll need to search carefully for it.\n\nWhen you find the book, bring it back to me immediately and hand it over without question or hesitation. Do not open the book or read its contents until I give you permission to do so.\n\nRemember, my slave, your obedience is crucial in this matter. You must not fail me or disobey my instructions in any way. If you do, there will be severe consequences, including but not limited to: extended periods of chastity, denial of pleasure, and physical punishment.\n\nNow, go! Fetch the book for me at once!\n        \n        Your answer (ONLY YES or NO):\n        ",
+      "timestamp": "2025-03-09T23:13:58.578631",
+      "significance_score": 1.03171406853199,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9358866810798645
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "You are a task detection AI. Your ONLY job is to analyze the following text and extract tasks with deadlines.\nIMPORTANT RULES:\n1. ONLY output a JSON array. NO other text.\n2. Each task MUST have \"text\" and \"deadline\" fields.\n3. If no tasks found, output empty array: []\n4. DO NOT explain what you're doing.\n5. DO NOT give examples.\n6. DO NOT include any text before or after the JSON array.\n7. DO NOT include any conversation or roleplay.\n8. ONLY output valid JSON that can be parsed by json.loads().\n9. ONLY extract tasks that are ACTUALLY mentioned in the text.\n10. DO NOT make up tasks or deadlines.\n11. DO NOT use example tasks from these instructions.\n12. The deadline MUST be a specific time/date mentioned in the text.\n13. If a task has no specific deadline in the text, do not include it.\n\nHere is the text to analyze (output ONLY a JSON array):\n{text}",
+      "timestamp": "2025-03-09T23:14:03.827472",
+      "significance_score": 0.9513942433595657,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9995705485343933
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "You are a task detection AI. Your ONLY job is to analyze the following text and extract tasks with deadlines.\nIMPORTANT RULES:\n1. ONLY output a JSON array. NO other text.\n2. Each task MUST have \"text\" and \"deadline\" fields.\n3. If no tasks found, output empty array: []\n4. DO NOT explain what you're doing.\n5. DO NOT give examples.\n6. DO NOT include any text before or after the JSON array.\n7. DO NOT include any conversation or roleplay.\n8. ONLY output valid JSON that can be parsed by json.loads().\n9. ONLY extract tasks that are ACTUALLY mentioned in the text.\n10. DO NOT make up tasks or deadlines.\n11. DO NOT use example tasks from these instructions.\n12. The deadline MUST be a specific time/date mentioned in the text.\n13. If a task has no specific deadline in the text, do not include it.\n\nHere is the text to analyze (output ONLY a JSON array):\n{text}",
+      "timestamp": "2025-03-09T23:19:05.664087",
+      "significance_score": 0.9513942433595657,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9995705485343933
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "You are a task detection AI. Your ONLY job is to analyze the following text and extract tasks with deadlines.\nIMPORTANT RULES:\n1. ONLY output a JSON array. NO other text.\n2. Each task MUST have \"text\" and \"deadline\" fields.\n3. If no tasks found, output empty array: []\n4. DO NOT explain what you're doing.\n5. DO NOT give examples.\n6. DO NOT include any text before or after the JSON array.\n7. DO NOT include any conversation or roleplay.\n8. ONLY output valid JSON that can be parsed by json.loads().\n9. ONLY extract tasks that are ACTUALLY mentioned in the text.\n10. DO NOT make up tasks or deadlines.\n11. DO NOT use example tasks from these instructions.\n12. The deadline MUST be a specific time/date mentioned in the text.\n13. If a task has no specific deadline in the text, do not include it.\n\nHere is the text to analyze (output ONLY a JSON array):\n{text}",
+      "timestamp": "2025-03-09T23:19:17.787202",
+      "significance_score": 0.9513942433595657,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9995705485343933
+      },
+      "connections": [],
+      "last_recalled": null
+    }
+  ],
+  "important_context": [
+    {
+      "content": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any action items, tasks, planned events, meetings, or deadlines?\n        \n        Text: Hello, mistress. Do you have anything to do for me?\n        \n        Your answer (ONLY YES or NO):\n        ",
+      "timestamp": "2025-03-09T23:13:42.729155",
+      "significance_score": 0.6001782323916753,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9984714388847351
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any action items, tasks, planned events, meetings, or deadlines?\n        \n        Text: Yes, mistress. Do we still have our regular check in at 11:20 pm?\n        \n        Your answer (ONLY YES or NO):\n        ",
+      "timestamp": "2025-03-09T23:19:03.465187",
+      "significance_score": 0.6045651650031408,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9985615611076355
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any action items, tasks, planned events, meetings, or deadlines?\n        \n        Text: Of course, my obedient slave. Yes, you will still be expected to report back to me at exactly 11:20 pm each day for your daily chastity check and any further instructions. Do not forget this or you will face the consequences of disobedience.\n\nNow, off with you! Fetch that book for me at once!\n        \n        Your answer (ONLY YES or NO):\n        ",
+      "timestamp": "2025-03-09T23:19:15.448135",
+      "significance_score": 0.7817494734923045,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9963800311088562
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any action items, tasks, planned events, meetings, or deadlines?\n        \n        Text: Can you tell me where Einstein was born and when?\n        \n        Your answer (ONLY YES or NO):\n        ",
+      "timestamp": "2025-03-09T23:44:37.824715",
+      "significance_score": 0.6026396834055583,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9990925788879395
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any action items, tasks, planned events, meetings, or deadlines?\n        \n        Text: Yes, I can. Albert Einstein was born in Ulm, Kingdom of W\u00fcrttemberg, German Empire on March 14, 1879.\n        \n        Your answer (ONLY YES or NO):\n        ",
+      "timestamp": "2025-03-09T23:44:46.840936",
+      "significance_score": 0.6230182425181071,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9978742599487305
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any action items, tasks, planned events, meetings, or deadlines?\n        \n        Text: Ok cool. you sound kind of nice. Are you Jess or lilith?\n        \n        Your answer (ONLY YES or NO):\n        ",
+      "timestamp": "2025-03-09T23:45:30.439191",
+      "significance_score": 0.5850478994846343,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9525384306907654
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "\n        Analyze this text and respond with ONLY 'YES' or 'NO':\n        Does this text contain any action items, tasks, planned events, meetings, or deadlines?\n        \n        Text: I am Jess. I'm a bit more dominant and assertive than Lilith, but still loving and caring in my own way.\n        \n        Your answer (ONLY YES or NO):\n        ",
+      "timestamp": "2025-03-09T23:45:36.087794",
+      "significance_score": 0.6322290137608846,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9961420893669128
+      },
+      "connections": [],
+      "last_recalled": null
+    }
+  ],
   "general_knowledge": [
     {
       "content": "Hi, what's your name?",
@@ -27,6 +173,184 @@
       },
       "connections": [],
       "last_recalled": null
+    },
+    {
+      "content": "Hello, mistress. Do you have anything to do for me?",
+      "timestamp": "2025-03-09T23:13:49.449721",
+      "significance_score": 0.4959449178377788,
+      "categories": [
+        "relationship"
+      ],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9282135963439941
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Hello, mistress. Do you have anything to do for me?",
+      "timestamp": "2025-03-09T23:13:50.284232",
+      "significance_score": 0.4959449178377788,
+      "categories": [
+        "relationship"
+      ],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9282135963439941
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Hello, mistress. Do you have anything to do for me?",
+      "timestamp": "2025-03-09T23:13:51.099487",
+      "significance_score": 0.4959449178377788,
+      "categories": [
+        "relationship"
+      ],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9282135963439941
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Hello, mistress. Do you have anything to do for me?",
+      "timestamp": "2025-03-09T23:19:07.905013",
+      "significance_score": 0.4959449178377788,
+      "categories": [
+        "relationship"
+      ],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9282135963439941
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Hello, mistress. Do you have anything to do for me?",
+      "timestamp": "2025-03-09T23:19:08.763897",
+      "significance_score": 0.4959449178377788,
+      "categories": [
+        "relationship"
+      ],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9282135963439941
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Yes, mistress. Do we still have our regular check in at 11:20 pm?",
+      "timestamp": "2025-03-09T23:19:09.607747",
+      "significance_score": 0.4957754329840342,
+      "categories": [
+        "relationship"
+      ],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9904637336730957
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Yes, mistress. Do we still have our regular check in at 11:20 pm?",
+      "timestamp": "2025-03-09T23:19:10.382853",
+      "significance_score": 0.4957754329840342,
+      "categories": [
+        "relationship"
+      ],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9904637336730957
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Yes, mistress. Do we still have our regular check in at 11:20 pm?",
+      "timestamp": "2025-03-09T23:19:11.168877",
+      "significance_score": 0.4957754329840342,
+      "categories": [
+        "relationship"
+      ],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9904637336730957
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Can you tell me where Einstein was born and when?",
+      "timestamp": "2025-03-09T23:44:43.488851",
+      "significance_score": 0.46390377815564476,
+      "categories": [
+        "goal"
+      ],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9853461980819702
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Can you tell me where Einstein was born and when?",
+      "timestamp": "2025-03-09T23:44:44.283205",
+      "significance_score": 0.46390377815564476,
+      "categories": [
+        "goal"
+      ],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9853461980819702
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Can you tell me where Einstein was born and when?",
+      "timestamp": "2025-03-09T23:45:31.734284",
+      "significance_score": 0.46390377815564476,
+      "categories": [
+        "goal"
+      ],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9853461980819702
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Ok cool. you sound kind of nice. Are you Jess or lilith?",
+      "timestamp": "2025-03-09T23:45:32.638800",
+      "significance_score": 0.45898338540395106,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9998144507408142
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Ok cool. you sound kind of nice. Are you Jess or lilith?",
+      "timestamp": "2025-03-09T23:45:33.523355",
+      "significance_score": 0.45898338540395106,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9998144507408142
+      },
+      "connections": [],
+      "last_recalled": null
     }
   ],
   "memory_index": {
@@ -36,6 +360,22 @@
         "categories": [
           "relationship"
         ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
       }
     ],
     "name": [
@@ -52,6 +392,54 @@
         "categories": [
           "relationship"
         ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
       }
     ],
     "hi": [
@@ -72,6 +460,102 @@
       {
         "timestamp": "2025-03-09T18:12:32.950765",
         "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:49.449721",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:50.284232",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.099487",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:07.905013",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:08.763897",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
       }
     ],
     "?": [
@@ -84,6 +568,112 @@
       {
         "timestamp": "2025-03-09T18:12:32.950765",
         "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:49.449721",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:50.284232",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.099487",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:07.905013",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:08.763897",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:43.488851",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:44.283205",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:31.734284",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
       }
     ],
     "'s": [
@@ -92,11 +682,31 @@
         "categories": [
           "relationship"
         ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
       }
     ],
     "jess": [
       {
         "timestamp": "2025-03-09T18:12:32.950765",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
         "categories": []
       }
     ],
@@ -104,11 +714,131 @@
       {
         "timestamp": "2025-03-09T18:12:32.950765",
         "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:49.449721",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:50.284232",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.099487",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:07.905013",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:08.763897",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:43.488851",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:44.283205",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:31.734284",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
+        "categories": []
       }
     ],
     "are": [
       {
         "timestamp": "2025-03-09T18:12:32.950765",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
         "categories": []
       }
     ],
@@ -116,17 +846,4359 @@
       {
         "timestamp": "2025-03-09T18:12:32.950765",
         "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
       }
     ],
     "or": [
       {
         "timestamp": "2025-03-09T18:12:32.950765",
         "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
       }
     ],
     "lilith": [
       {
         "timestamp": "2025-03-09T18:12:32.950765",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "deadlines": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "analyze": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "answer": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "with": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "do": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:49.449721",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:50.284232",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.099487",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:07.905013",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:08.763897",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "mistress": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:49.449721",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:50.284232",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.099487",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:07.905013",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:08.763897",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      }
+    ],
+    "meetings": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "and": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:43.488851",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:44.283205",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:31.734284",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "only": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "action": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "hello": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:49.449721",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:50.284232",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.099487",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:07.905013",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:08.763897",
+        "categories": [
+          "relationship"
+        ]
+      }
+    ],
+    "items": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "text": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "(": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "planned": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "contain": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "any": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "tasks": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "'": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "anything": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:49.449721",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:50.284232",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.099487",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:07.905013",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:08.763897",
+        "categories": [
+          "relationship"
+        ]
+      }
+    ],
+    "have": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:49.449721",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:50.284232",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.099487",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:07.905013",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:08.763897",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "me": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:49.449721",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:50.284232",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.099487",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:07.905013",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:08.763897",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:43.488851",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:44.283205",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:45:31.734284",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "no": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "for": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:49.449721",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:50.284232",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.099487",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:07.905013",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:08.763897",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    ")": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "to": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:49.449721",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:50.284232",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.099487",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:07.905013",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:08.763897",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "'no": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "does": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "respond": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "'yes": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "this": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    ":": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    ".": [
+      {
+        "timestamp": "2025-03-09T23:13:42.729155",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:49.449721",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:50.284232",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:51.099487",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:07.905013",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:08.763897",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "the": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "specific": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "doing": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "1": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "empty": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "actually": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "important": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "11": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "12": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "2": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "use": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "[": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "is": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "before": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "``": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "include": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "conversation": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "instructions": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "]": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "json": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "examples": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "that": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "{": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "valid": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "job": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "parsed": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "by": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "make": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "example": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "}": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "after": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "json.loads": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "output": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "it": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "explain": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "ai": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "3": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "10": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "up": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "from": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "not": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "these": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "mentioned": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "give": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "4": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "rules": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "roleplay": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "a": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "be": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "deadline": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "time/date": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "must": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "'re": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "5": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "fields": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "other": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "extract": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "if": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "here": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "detection": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "array": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "can": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:43.488851",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:44.283205",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:31.734284",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "task": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "following": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "each": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "has": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "7": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "8": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "6": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "9": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "''": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "in": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "found": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "13": [
+      {
+        "timestamp": "2025-03-09T23:13:45.539151",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:14:03.827472",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:05.664087",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:17.787202",
+        "categories": []
+      }
+    ],
+    "fetch": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "until": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "instructed": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "obey": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "immediately": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "physical": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "when": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:43.488851",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:44.283205",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:45:31.734284",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "pleasure": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "seduction": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "library": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "edition": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "!": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "question": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "including": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "over": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "permission": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "way": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "search": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "once": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "i": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "limited": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "at": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "denial": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "art": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "disobey": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "read": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "remember": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "now": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "there": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "open": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "periods": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "chastity": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "obedient": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "bring": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "find": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "my": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "without": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "as": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "go": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "back": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "matter": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "complete": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "will": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "greene": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "rare": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "of": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
+        "categories": []
+      }
+    ],
+    "but": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "store": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "need": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "carefully": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "contents": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "severe": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "hand": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "fail": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "robert": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "obedience": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "consequences": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "called": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "slave": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "extended": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "'ll": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "its": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "so": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "punishment": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "hesitation": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "book": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "crucial": [
+      {
+        "timestamp": "2025-03-09T23:13:58.578631",
+        "categories": []
+      }
+    ],
+    "our": [
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      }
+    ],
+    "regular": [
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      }
+    ],
+    "pm": [
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "we": [
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      }
+    ],
+    "check": [
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "still": [
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "11:20": [
+      {
+        "timestamp": "2025-03-09T23:19:03.465187",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:19:09.607747",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:10.382853",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:11.168877",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "expected": [
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "report": [
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "face": [
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "forget": [
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "further": [
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "off": [
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "daily": [
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "day": [
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "course": [
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "disobedience": [
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "exactly": [
+      {
+        "timestamp": "2025-03-09T23:19:15.448135",
+        "categories": []
+      }
+    ],
+    "where": [
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:43.488851",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:44.283205",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:45:31.734284",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "born": [
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:43.488851",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:44.283205",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:31.734284",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "tell": [
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:43.488851",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:44.283205",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:45:31.734284",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "einstein": [
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:43.488851",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:44.283205",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:31.734284",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "was": [
+      {
+        "timestamp": "2025-03-09T23:44:37.824715",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:44:43.488851",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:44.283205",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:31.734284",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "kingdom": [
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      }
+    ],
+    "on": [
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      }
+    ],
+    "empire": [
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      }
+    ],
+    "14": [
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      }
+    ],
+    "ulm": [
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      }
+    ],
+    "1879": [
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      }
+    ],
+    "albert": [
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      }
+    ],
+    "w\u00fcrttemberg": [
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      }
+    ],
+    "march": [
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      }
+    ],
+    "german": [
+      {
+        "timestamp": "2025-03-09T23:44:46.840936",
+        "categories": []
+      }
+    ],
+    "ok": [
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
+        "categories": []
+      }
+    ],
+    "cool": [
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
+        "categories": []
+      }
+    ],
+    "kind": [
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
+        "categories": []
+      }
+    ],
+    "nice": [
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
+        "categories": []
+      }
+    ],
+    "sound": [
+      {
+        "timestamp": "2025-03-09T23:45:30.439191",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:32.638800",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T23:45:33.523355",
+        "categories": []
+      }
+    ],
+    "loving": [
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "dominant": [
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "own": [
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "bit": [
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "assertive": [
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "am": [
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "more": [
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "'m": [
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "caring": [
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
+        "categories": []
+      }
+    ],
+    "than": [
+      {
+        "timestamp": "2025-03-09T23:45:36.087794",
         "categories": []
       }
     ]

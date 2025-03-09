@@ -7,6 +7,9 @@ import logging
 from datetime import datetime, timedelta
 import json
 import re
+import asyncio
+import uuid
+import dateparser
 
 from app.database.database import Database
 from app.llm.lmstudio_client import LMStudioClient
@@ -40,128 +43,146 @@ class CentralController:
             personality_manager=personality_manager,
             task_scheduler=task_scheduler
         )
+        
+        # Load Jess's character
+        try:
+            asyncio.create_task(self.personality_manager.load_character("jess"))
+            self.logger.info("Loaded Jess's character")
+        except Exception as e:
+            self.logger.error(f"Error loading Jess's character: {str(e)}")
     
     async def process_message(
         self,
         user_id: str,
         message: str,
-        conversation_id: Optional[str] = None
+        conversation_id: Optional[str] = None,
+        message_id: Optional[int] = None
     ) -> Dict[str, Any]:
         """Process an incoming message using the character-driven approach"""
-        self.logger.info(f"Processing message from user {user_id}: {message[:50]}...")
-        
-        # Create or get conversation
-        if not conversation_id:
-            conversation_id = f"conv_{datetime.now().isoformat()}_{user_id}"
-            await self.database.create_conversation(
-                conversation_id=conversation_id,
-                user_id=user_id,
-                title=f"Conversation {datetime.now().strftime('%Y-%m-%d %H:%M')}"
-            )
-        
-        # Store user message
-        message_id, _ = await self.database.store_message(
-            user_id=user_id,
-            content=message,
-            role="user",
-            conversation_id=conversation_id
-        )
-        
-        # Get conversation context
-        context = await self.get_conversation_context(conversation_id)
-        
         try:
-            # Process message through personality system
-            if self.llm_client:
-                # Add time context
-                now = datetime.now()
-                tomorrow = now + timedelta(days=1)
-                context["time_context"] = {
-                    "current_date": now.strftime("%Y-%m-%d"),
-                    "current_time": now.strftime("%I:%M %p"),
-                    "current_day_of_week": now.strftime("%A"),
-                    "tomorrow_date": tomorrow.strftime("%Y-%m-%d"),
-                    "tomorrow_day_of_week": tomorrow.strftime("%A"),
-                    "timezone": now.astimezone().tzname()
+            # Store the message if it's not an edit (message_id is None)
+            if message_id is None:
+                message_id, conversation_id = await self.database.store_message(
+                    user_id=user_id,
+                    content=message,
+                    role="user",
+                    conversation_id=conversation_id
+                )
+            
+            # Get conversation context
+            context = await self.get_conversation_context(conversation_id)
+            
+            # Detect tasks in user's message
+            self.logger.info("Attempting to detect tasks in user message...")
+            user_tasks = await self.llm_client.detect_tasks(message)
+            self.logger.info(f"Detected {len(user_tasks)} tasks in user message")
+            
+            # Store any tasks found in user's message
+            for task in user_tasks:
+                task_id = str(uuid.uuid4())
+                self.logger.info(f"Processing task from user message: {task}")
+                
+                # Format task parameters
+                task_params = {
+                    "text": task["text"],
+                    "user_id": user_id,
+                    "conversation_id": conversation_id
+                }
+                self.logger.info(f"Task parameters: {task_params}")
+                
+                # Convert deadline string to datetime
+                try:
+                    deadline = dateparser.parse(task['deadline'], settings={'PREFER_DATES_FROM': 'future'})
+                    if deadline:
+                        task_params['deadline'] = deadline
+                        try:
+                            await self.task_scheduler.store_task(task_id, task_params)
+                        except Exception as e:
+                            self.logger.error(f"Error storing task {task_id}: {e}")
+                    else:
+                        self.logger.warning(f"Could not parse deadline: {task['deadline']}")
+                except Exception as e:
+                    self.logger.error(f"Error parsing deadline: {e}")
+            
+            # Build conversation history for response generation
+            recent_messages = []
+            
+            if conversation_id:
+                # Get last 5 messages for context
+                history = await self.database.get_conversation_history(conversation_id, limit=5)
+                for msg in history:
+                    # Only include messages that are part of the conversation flow
+                    if msg["role"] in ["user", "assistant"]:
+                        recent_messages.append({
+                            "role": msg["role"],
+                            "content": msg["content"]
+                        })
+            
+            # Add current message
+            recent_messages.append({"role": "user", "content": message})
+            
+            # Generate character response
+            try:
+                response = await self.llm_client.generate_response(
+                    messages=recent_messages,
+                    context=context
+                )
+                
+                # Store response
+                response_id, _ = await self.database.store_message(
+                    user_id=user_id,
+                    content=response,
+                    role="assistant",
+                    conversation_id=conversation_id,
+                    parent_id=message_id
+                )
+                
+                # Detect tasks in the response
+                self.logger.info("Attempting to detect tasks in response...")
+                response_tasks = await self.llm_client.detect_tasks(response)
+                self.logger.info(f"Detected {len(response_tasks)} tasks in response")
+                
+                # Store any tasks found in response
+                for task in response_tasks:
+                    task_id = str(uuid.uuid4())
+                    self.logger.info(f"Processing task from response: {task}")
+                    
+                    # Format task parameters
+                    task_params = {
+                        "text": task["text"],
+                        "user_id": user_id,
+                        "conversation_id": conversation_id
+                    }
+                    self.logger.info(f"Task parameters: {task_params}")
+                    
+                    # Convert deadline string to datetime
+                    try:
+                        deadline = dateparser.parse(task['deadline'], settings={'PREFER_DATES_FROM': 'future'})
+                        if deadline:
+                            task_params['deadline'] = deadline
+                            try:
+                                await self.task_scheduler.store_task(task_id, task_params)
+                            except Exception as e:
+                                self.logger.error(f"Error storing task {task_id}: {e}")
+                        else:
+                            self.logger.warning(f"Could not parse deadline: {task['deadline']}")
+                    except Exception as e:
+                        self.logger.error(f"Error parsing deadline: {e}")
+                
+                return {
+                    "response": response,
+                    "conversation_id": conversation_id,
+                    "message_id": response_id,
+                    "parent_id": message_id
                 }
                 
-                # Check for time-related patterns in message
-                time_patterns = await self._extract_time_patterns(message)
-                if time_patterns:
-                    # Schedule follow-ups for any detected times
-                    for pattern in time_patterns:
-                        await self.proactive_system.schedule_followup(
-                            scheduled_time=pattern["time"],
-                            context={
-                                "original_message": message,
-                                "detected_time": pattern["time"].isoformat(),
-                                "time_context": pattern["context"]
-                            },
-                            user_id=user_id
-                        )
+            except Exception as e:
+                self.logger.error(f"Error generating response: {str(e)}", exc_info=True)
+                raise  # Let the outer try-catch handle this
                 
-                # Get recent conversation history for context
-                recent_messages = []
-                if conversation_id:
-                    # Get last 5 messages for context
-                    history = await self.database.get_conversation_history(conversation_id, limit=5)
-                    for msg in history:
-                        # Only include messages that are part of the conversation flow
-                        if msg["role"] in ["user", "assistant"]:
-                            recent_messages.append({
-                                "role": msg["role"],
-                                "content": msg["content"]
-                            })
-                
-                # Add current message
-                recent_messages.append({"role": "user", "content": message})
-                
-                # Generate character response
-                try:
-                    response = await self.llm_client.generate_response(
-                        messages=recent_messages,
-                        context=context
-                    )
-                    
-                    # Store response
-                    response_id, _ = await self.database.store_message(
-                        user_id=user_id,
-                        content=response,
-                        role="assistant",
-                        conversation_id=conversation_id,
-                        parent_id=message_id
-                    )
-                    
-                    return {
-                        "response": response,
-                        "conversation_id": conversation_id,
-                        "message_id": response_id,
-                        "parent_id": message_id
-                    }
-                    
-                except Exception as e:
-                    self.logger.error(f"Error generating response: {str(e)}", exc_info=True)
-                    raise  # Let the outer try-catch handle this
-            
         except Exception as e:
-            self.logger.error(f"Error processing message: {str(e)}", exc_info=True)
-            
-            # Fallback response
-            fallback = "I'm having trouble processing that right now. Could you rephrase?"
-            response_id, _ = await self.database.store_message(
-                user_id=user_id,
-                content=fallback,
-                role="assistant",
-                conversation_id=conversation_id,
-                parent_id=message_id
-            )
-            
-            return {
-                "response": fallback,
-                "conversation_id": conversation_id,
-                "message_id": response_id,
-                "parent_id": message_id
-            }
+            self.logger.error(f"Error processing interaction: {str(e)}", exc_info=True)
+            raise
     
     async def _extract_time_patterns(self, message: str) -> List[Dict[str, Any]]:
         """Extract time-related patterns from message for scheduling follow-ups"""
