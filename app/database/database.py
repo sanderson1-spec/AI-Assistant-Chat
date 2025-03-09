@@ -400,34 +400,47 @@ class Database:
         conn.commit()
         conn.close()
     
-    async def get_conversation_history(self, conversation_id, limit=100):
-        """Get messages from a specific conversation"""
+    async def get_conversation_history(self, conversation_id: str, limit: int = None) -> List[Dict[str, Any]]:
+        """Get conversation history, optionally limited to the last N messages"""
         conn = self.get_connection()
         cursor = conn.cursor()
         
-        # Get all messages but filter out inactive response versions
-        cursor.execute("""
-        SELECT m.id, m.user_id, m.timestamp, m.content, m.role, m.parent_id, m.is_edited, m.version, m.metadata
-        FROM messages m
-        WHERE m.conversation_id = ? AND (m.role != 'assistant' OR m.is_active_version = 1)
-        ORDER BY m.timestamp ASC
-        LIMIT ?
-        """, (conversation_id, limit))
-        
-        messages = cursor.fetchall()
-        conn.close()
-        
-        return [{
-            "id": row[0],
-            "user_id": row[1],
-            "timestamp": row[2],
-            "content": row[3],
-            "role": row[4],
-            "parent_id": row[5],
-            "is_edited": bool(row[6]),
-            "version": row[7],
-            "metadata": json.loads(row[8]) if row[8] else None
-        } for row in messages]
+        try:
+            # Get all messages but filter out inactive response versions
+            query = """
+            SELECT m.id, m.user_id, m.timestamp, m.content, m.role, m.parent_id, m.is_edited, m.version, m.metadata
+            FROM messages m
+            WHERE m.conversation_id = ? AND (m.role != 'assistant' OR m.is_active_version = 1)
+            ORDER BY m.timestamp ASC
+            """
+            
+            if limit:
+                query += f" LIMIT {limit}"
+            
+            cursor.execute(query, (conversation_id,))
+            messages = cursor.fetchall()
+            
+            # Convert to list of dictionaries
+            result = [{
+                "id": row[0],
+                "user_id": row[1],
+                "timestamp": row[2],
+                "content": row[3],
+                "role": row[4],
+                "parent_id": row[5],
+                "is_edited": bool(row[6]),
+                "version": row[7],
+                "metadata": json.loads(row[8]) if row[8] else None
+            } for row in messages]
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Error getting conversation history: {str(e)}")
+            return []
+            
+        finally:
+            conn.close()
     
     async def get_recent_conversations(self, user_id, limit=10):
         """Get recent conversations for a user"""

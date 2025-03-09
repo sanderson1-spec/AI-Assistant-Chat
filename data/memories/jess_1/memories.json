@@ -1,0 +1,134 @@
+{
+  "critical_events": [],
+  "important_context": [],
+  "general_knowledge": [
+    {
+      "content": "Hi, what's your name?",
+      "timestamp": "2025-03-09T18:12:19.221275",
+      "significance_score": 0.45023681863149007,
+      "categories": [
+        "relationship"
+      ],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9928718209266663
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Yes, are you Jess or Lilith?",
+      "timestamp": "2025-03-09T18:12:32.950765",
+      "significance_score": 0.417526694059372,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9630247354507446
+      },
+      "connections": [],
+      "last_recalled": null
+    }
+  ],
+  "memory_index": {
+    "what": [
+      {
+        "timestamp": "2025-03-09T18:12:19.221275",
+        "categories": [
+          "relationship"
+        ]
+      }
+    ],
+    "name": [
+      {
+        "timestamp": "2025-03-09T18:12:19.221275",
+        "categories": [
+          "relationship"
+        ]
+      }
+    ],
+    "your": [
+      {
+        "timestamp": "2025-03-09T18:12:19.221275",
+        "categories": [
+          "relationship"
+        ]
+      }
+    ],
+    "hi": [
+      {
+        "timestamp": "2025-03-09T18:12:19.221275",
+        "categories": [
+          "relationship"
+        ]
+      }
+    ],
+    ",": [
+      {
+        "timestamp": "2025-03-09T18:12:19.221275",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T18:12:32.950765",
+        "categories": []
+      }
+    ],
+    "?": [
+      {
+        "timestamp": "2025-03-09T18:12:19.221275",
+        "categories": [
+          "relationship"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T18:12:32.950765",
+        "categories": []
+      }
+    ],
+    "'s": [
+      {
+        "timestamp": "2025-03-09T18:12:19.221275",
+        "categories": [
+          "relationship"
+        ]
+      }
+    ],
+    "jess": [
+      {
+        "timestamp": "2025-03-09T18:12:32.950765",
+        "categories": []
+      }
+    ],
+    "you": [
+      {
+        "timestamp": "2025-03-09T18:12:32.950765",
+        "categories": []
+      }
+    ],
+    "are": [
+      {
+        "timestamp": "2025-03-09T18:12:32.950765",
+        "categories": []
+      }
+    ],
+    "yes": [
+      {
+        "timestamp": "2025-03-09T18:12:32.950765",
+        "categories": []
+      }
+    ],
+    "or": [
+      {
+        "timestamp": "2025-03-09T18:12:32.950765",
+        "categories": []
+      }
+    ],
+    "lilith": [
+      {
+        "timestamp": "2025-03-09T18:12:32.950765",
+        "categories": []
+      }
+    ]
+  }
+}

@@ -74,41 +74,96 @@ class PersonalityManager:
         Args:
             character_data: Dictionary containing:
                 - name: Character name
-                - backstory: Character's background story
-                - personality_traits: Dict of trait names and values
-                - speech_style: Description of how the character speaks
-                - knowledge_domains: List of areas the character is knowledgeable about
+                - description: Brief character description
+                - definition: Detailed character definition
+                - sample_messages: List of sample messages
+                - behavioral_settings: Dictionary of behavioral settings
                 
         Returns:
             Character ID
         """
-        # Generate unique character ID
-        character_id = f"char_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        self.logger.info(f"Creating new character with data: {json.dumps(character_data, indent=2)}")
         
-        # Create character profile
-        character = {
-            "id": character_id,
-            "created_at": datetime.now().isoformat(),
-            "last_interaction": None,
-            "interaction_count": 0,
-            **character_data,
-            "development": {
-                "relationship_level": 0,
-                "learned_preferences": {},
-                "conversation_style_adaptations": {},
-                "significant_interactions": []
+        try:
+            # Use the character name as the base for the ID (sanitized)
+            base_name = "".join(c for c in character_data["name"] if c.isalnum())
+            character_id = base_name.lower()
+            
+            # If file already exists, append a number
+            counter = 1
+            while (self.data_dir / f"{character_id}.json").exists():
+                character_id = f"{base_name.lower()}_{counter}"
+                counter += 1
+            
+            self.logger.debug(f"Generated character ID: {character_id}")
+            
+            # Create character profile
+            character = {
+                "id": character_id,
+                "created_at": datetime.now().isoformat(),
+                "name": character_data["name"],
+                "description": character_data.get("description", ""),
+                "definition": character_data.get("definition", ""),
+                "sample_messages": character_data.get("sample_messages", []),
+                "behavioral_settings": character_data.get("behavioral_settings", {
+                    "learns_from_conversation": False,
+                    "remembers_context": False,
+                    "uses_memories": False
+                }),
+                # Add compatibility with old format
+                "traits": {
+                    "friendliness": 0.7,
+                    "formality": 0.5,
+                    "helpfulness": 0.8,
+                    "creativity": 0.6,
+                    "humor": 0.5
+                },
+                "speaking_style": {
+                    "tone": "friendly and professional",
+                    "language_complexity": "moderate",
+                    "uses_emojis": False,
+                    "emoji_frequency": 0.3
+                },
+                "behavioral_preferences": {
+                    "proactive_suggestions": True,
+                    "error_handling_style": "supportive",
+                    "technical_detail_level": "adaptive"
+                },
+                "background_story": {
+                    "role": character_data.get("description", ""),
+                    "expertise_areas": [],
+                    "communication_style": "Based on character definition"
+                },
+                "development": {
+                    "relationship_level": 0,
+                    "learned_preferences": {},
+                    "conversation_style_adaptations": {},
+                    "significant_interactions": []
+                },
+                "interaction_count": 0,
+                "last_interaction": None
             }
-        }
-        
-        # Save character
-        char_path = self.data_dir / f"{character_id}.json"
-        with open(char_path, "w") as f:
-            json.dump(character, f, indent=2)
-        
-        # Initialize memory manager for this character
-        memory_manager = MemoryManager(character_id)
-        
-        return character_id
+            
+            # Save character
+            char_path = self.data_dir / f"{character_id}.json"
+            self.logger.debug(f"Saving character to: {char_path}")
+            
+            # Ensure directory exists
+            self.data_dir.mkdir(parents=True, exist_ok=True)
+            
+            with open(char_path, "w") as f:
+                json.dump(character, f, indent=2)
+            
+            self.logger.info(f"Successfully created character {character['name']} with ID {character_id}")
+            
+            # Initialize memory manager for this character
+            memory_manager = MemoryManager(character_id)
+            
+            return character_id
+            
+        except Exception as e:
+            self.logger.error(f"Error creating character: {str(e)}", exc_info=True)
+            raise
     
     async def load_character(self, character_id: str):
         """Load a character and its memories"""
@@ -118,6 +173,16 @@ class PersonalityManager:
         
         with open(char_path, "r") as f:
             self.active_character = json.load(f)
+            
+        # Ensure required fields exist
+        if "interaction_count" not in self.active_character:
+            self.active_character["interaction_count"] = 0
+            
+        if "last_interaction" not in self.active_character:
+            self.active_character["last_interaction"] = None
+            
+        # Save the initialized character
+        self._save_active_character()
         
         # Initialize memory manager
         self.memory_manager = MemoryManager(character_id)
@@ -210,30 +275,53 @@ class PersonalityManager:
         # Build rich character prompt
         char = self.active_character
         prompt = [
-            f"You are {char['name']}, with the following traits:",
-            "\nPersonality:",
+            f"You are {char['name']}. You must always stay in character and respond as {char['name']}. Never break character or refer to yourself as an AI, language model, or assistant.",
+            "\nCore Identity:",
+            f"Name: {char['name']}",
+            f"Description: {char.get('description', '')}",
+            "\nCharacter Definition:",
+            char.get('definition', ''),
+            "\nPersonality Traits:",
         ]
         
         # Add personality traits
-        for trait, value in char["traits"].items():
+        traits = char.get('traits', {})
+        for trait, value in traits.items():
             prompt.append(f"- {trait}: {value}")
         
         # Add speaking style
+        speaking_style = char.get('speaking_style', {})
         prompt.extend([
-            "\nSpeech Style:",
-            json.dumps(char["speaking_style"], indent=2)
+            "\nSpeaking Style:",
+            f"- Tone: {speaking_style.get('tone', 'friendly and professional')}",
+            f"- Language Complexity: {speaking_style.get('language_complexity', 'moderate')}",
         ])
         
-        # Add behavioral preferences
-        prompt.extend([
-            "\nBehavioral Preferences:",
-            json.dumps(char["behavioral_preferences"], indent=2)
-        ])
+        # Add sample messages if available
+        if char.get('sample_messages'):
+            prompt.extend([
+                "\nExample Interactions (use these to understand how you should interact):",
+                *[f"- {msg}" for msg in char['sample_messages']]
+            ])
         
-        # Add background story
+        # Add behavioral settings
+        behavioral = char.get('behavioral_settings', {})
+        if any(behavioral.values()):
+            prompt.append("\nBehavioral Settings:")
+            if behavioral.get('learns_from_conversation'):
+                prompt.append("- You learn and adapt from conversations")
+            if behavioral.get('remembers_context'):
+                prompt.append("- You maintain context throughout conversations")
+            if behavioral.get('uses_memories'):
+                prompt.append("- You use long-term memories to maintain continuity")
+        
+        # Add strict instructions
         prompt.extend([
-            "\nBackground:",
-            json.dumps(char["background_story"], indent=2)
+            "\nCritical Instructions:",
+            f"1. You are {char['name']} - NEVER break character or refer to yourself as an AI, language model, or assistant",
+            "2. Always respond in a way that's consistent with your character definition and personality traits",
+            "3. Use your defined speaking style and maintain character voice at all times",
+            "4. If asked about your identity, respond as your character would, never revealing you're an AI"
         ])
         
         return "\n".join(prompt)
@@ -241,18 +329,33 @@ class PersonalityManager:
     async def get_character_list(self) -> List[Dict[str, Any]]:
         """Get list of available characters"""
         characters = []
-        for char_file in self.data_dir.glob("*.json"):
-            if char_file.name != "default.json":
-                with open(char_file, "r") as f:
-                    char_data = json.load(f)
-                    characters.append({
-                        "id": char_data["id"],
-                        "name": char_data["name"],
-                        "description": char_data.get("backstory", "")[:100] + "...",
-                        "interaction_count": char_data["interaction_count"],
-                        "last_interaction": char_data["last_interaction"]
-                    })
-        return characters
+        try:
+            # Ensure directory exists
+            self.data_dir.mkdir(parents=True, exist_ok=True)
+            
+            # List all JSON files in the directory
+            for char_file in self.data_dir.glob("*.json"):
+                if char_file.name != "default.json":
+                    try:
+                        with open(char_file, "r") as f:
+                            char_data = json.load(f)
+                            characters.append({
+                                "id": char_data.get("id", char_file.stem),
+                                "name": char_data.get("name", char_file.stem),
+                                "description": char_data.get("description", ""),
+                                "definition": char_data.get("definition", ""),
+                                "sample_messages": char_data.get("sample_messages", []),
+                                "behavioral_settings": char_data.get("behavioral_settings", {})
+                            })
+                    except Exception as e:
+                        self.logger.error(f"Error loading character from {char_file}: {str(e)}")
+                        # Continue with other files even if one fails
+                        continue
+            
+            return characters
+        except Exception as e:
+            self.logger.error(f"Error getting character list: {str(e)}")
+            raise
     
     def _load_personality(self) -> Dict[str, Any]:
         """Load personality traits from configuration"""

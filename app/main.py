@@ -5,6 +5,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, Depends, H
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
 import uuid
@@ -13,6 +14,7 @@ import sys
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 from app.bots.chat_bot import ChatBot
+from pathlib import Path
 
 # Configure root logger
 logging.basicConfig(
@@ -73,8 +75,29 @@ else:
 # Create FastAPI app
 app = FastAPI(title="AI Assistant")
 
-# Set up static files and templates
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Set up static files and templates with cache control
+app.mount("/static", 
+    StaticFiles(directory="app/static", html=True), 
+    name="static"
+)
+
+# Create custom response class for templates with cache control
+class NoCacheTemplateResponse(HTMLResponse):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        self.headers["Pragma"] = "no-cache"
+        self.headers["Expires"] = "0"
+
 templates = Jinja2Templates(directory="app/templates")
 
 # Create data directory if it doesn't exist
@@ -194,7 +217,7 @@ def shutdown_event():
 async def get_home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/settings", response_class=HTMLResponse)
+@app.get("/settings", response_class=NoCacheTemplateResponse)
 async def get_settings(request: Request):
     return templates.TemplateResponse("settings.html", {"request": request})
 
@@ -546,6 +569,83 @@ async def cancel_task(task_id: str):
     """Cancel a scheduled task"""
     success = await task_scheduler.cancel_task(task_id)
     return {"success": success}
+
+@app.get("/api/characters")
+async def get_characters():
+    """Get list of available characters"""
+    try:
+        return await personality_manager.get_character_list()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/characters/{name}")
+async def get_character(name: str):
+    """Get a specific character by name"""
+    try:
+        # Find character in the list
+        characters = await personality_manager.get_character_list()
+        character = next((c for c in characters if c["name"] == name), None)
+        if not character:
+            raise HTTPException(status_code=404, detail=f"Character not found: {name}")
+        return character
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/characters")
+async def create_or_update_character(character: Dict[str, Any]):
+    """Create or update a character"""
+    try:
+        print(f"Received character data: {json.dumps(character, indent=2)}")
+        # Create new character
+        character_id = await personality_manager.create_character(character)
+        print(f"Character created with ID: {character_id}")
+        return {"status": "success", "id": character_id}
+    except Exception as e:
+        print(f"Error creating character: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/characters/{name}")
+async def delete_character(name: str):
+    """Delete a character"""
+    try:
+        # Find character and delete it
+        characters = await personality_manager.get_character_list()
+        character = next((c for c in characters if c["name"] == name), None)
+        if not character:
+            raise HTTPException(status_code=404, detail=f"Character not found: {name}")
+        
+        # Delete character file
+        char_path = Path("data/personalities") / f"{character['id']}.json"
+        if char_path.exists():
+            char_path.unlink()
+        return {"status": "success"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/active-character")
+async def set_active_character(data: Dict[str, Any]):
+    """Set the active character"""
+    try:
+        name = data.get("name")
+        if name:
+            # Load the character
+            characters = await personality_manager.get_character_list()
+            character = next((c for c in characters if c["name"] == name), None)
+            if not character:
+                raise HTTPException(status_code=404, detail=f"Character not found: {name}")
+            await personality_manager.load_character(character["id"])
+        else:
+            # Reset to default character
+            await personality_manager.load_character("default")
+        return {"status": "success"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

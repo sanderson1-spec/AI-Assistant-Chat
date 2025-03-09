@@ -73,6 +73,18 @@ class CentralController:
         try:
             # Process message through personality system
             if self.llm_client:
+                # Add time context
+                now = datetime.now()
+                tomorrow = now + timedelta(days=1)
+                context["time_context"] = {
+                    "current_date": now.strftime("%Y-%m-%d"),
+                    "current_time": now.strftime("%I:%M %p"),
+                    "current_day_of_week": now.strftime("%A"),
+                    "tomorrow_date": tomorrow.strftime("%Y-%m-%d"),
+                    "tomorrow_day_of_week": tomorrow.strftime("%A"),
+                    "timezone": now.astimezone().tzname()
+                }
+                
                 # Check for time-related patterns in message
                 time_patterns = await self._extract_time_patterns(message)
                 if time_patterns:
@@ -88,27 +100,48 @@ class CentralController:
                             user_id=user_id
                         )
                 
+                # Get recent conversation history for context
+                recent_messages = []
+                if conversation_id:
+                    # Get last 5 messages for context
+                    history = await self.database.get_conversation_history(conversation_id, limit=5)
+                    for msg in history:
+                        # Only include messages that are part of the conversation flow
+                        if msg["role"] in ["user", "assistant"]:
+                            recent_messages.append({
+                                "role": msg["role"],
+                                "content": msg["content"]
+                            })
+                
+                # Add current message
+                recent_messages.append({"role": "user", "content": message})
+                
                 # Generate character response
-                response = await self.llm_client.generate_response(
-                    messages=[{"role": "user", "content": message}],
-                    context=context
-                )
-                
-                # Store response
-                response_id, _ = await self.database.store_message(
-                    user_id=user_id,
-                    content=response,
-                    role="assistant",
-                    conversation_id=conversation_id,
-                    parent_id=message_id
-                )
-                
-                return {
-                    "response": response,
-                    "conversation_id": conversation_id,
-                    "message_id": response_id,
-                    "parent_id": message_id
-                }
+                try:
+                    response = await self.llm_client.generate_response(
+                        messages=recent_messages,
+                        context=context
+                    )
+                    
+                    # Store response
+                    response_id, _ = await self.database.store_message(
+                        user_id=user_id,
+                        content=response,
+                        role="assistant",
+                        conversation_id=conversation_id,
+                        parent_id=message_id
+                    )
+                    
+                    return {
+                        "response": response,
+                        "conversation_id": conversation_id,
+                        "message_id": response_id,
+                        "parent_id": message_id
+                    }
+                    
+                except Exception as e:
+                    self.logger.error(f"Error generating response: {str(e)}", exc_info=True)
+                    raise  # Let the outer try-catch handle this
             
         except Exception as e:
             self.logger.error(f"Error processing message: {str(e)}", exc_info=True)

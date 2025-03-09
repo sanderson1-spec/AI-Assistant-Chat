@@ -187,6 +187,42 @@
       },
       "connections": [],
       "last_recalled": null
+    },
+    {
+      "content": "Awesome and what timezone is this?",
+      "timestamp": "2025-03-09T15:28:11.710711",
+      "significance_score": 0.4498411056995392,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.999724805355072
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Hi",
+      "timestamp": "2025-03-09T18:20:28.523525",
+      "significance_score": 0.4135774744351705,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9983267188072205
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Hey, what's your name?",
+      "timestamp": "2025-03-09T18:20:35.972769",
+      "significance_score": 0.41500300176938376,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.969743013381958
+      },
+      "connections": [],
+      "last_recalled": null
     }
   ],
   "memory_index": {
@@ -213,6 +249,10 @@
       },
       {
         "timestamp": "2025-03-09T13:24:08.105244",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T18:20:35.972769",
         "categories": []
       }
     ],
@@ -245,6 +285,10 @@
       },
       {
         "timestamp": "2025-03-09T13:24:08.105244",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T18:20:35.972769",
         "categories": []
       }
     ],
@@ -286,6 +330,14 @@
       {
         "timestamp": "2025-03-09T14:59:50.892505",
         "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T15:28:11.710711",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T18:20:35.972769",
+        "categories": []
       }
     ],
     "hey": [
@@ -311,6 +363,10 @@
       },
       {
         "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T18:20:35.972769",
         "categories": []
       }
     ],
@@ -343,6 +399,10 @@
       },
       {
         "timestamp": "2025-03-09T13:24:08.105244",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T18:20:35.972769",
         "categories": []
       }
     ],
@@ -390,6 +450,14 @@
       {
         "timestamp": "2025-03-09T14:59:50.892505",
         "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T15:28:11.710711",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T18:20:35.972769",
+        "categories": []
       }
     ],
     ",": [
@@ -421,6 +489,10 @@
       },
       {
         "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T18:20:35.972769",
         "categories": []
       }
     ],
@@ -618,6 +690,10 @@
       {
         "timestamp": "2025-03-09T13:25:13.044056",
         "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T15:28:11.710711",
+        "categories": []
       }
     ],
     "a": [
@@ -684,6 +760,10 @@
       {
         "timestamp": "2025-03-09T13:11:00.954981",
         "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T18:20:28.523525",
+        "categories": []
       }
     ],
     "was": [
@@ -737,6 +817,10 @@
     "and": [
       {
         "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T15:28:11.710711",
         "categories": []
       }
     ],
@@ -809,6 +893,24 @@
     "are": [
       {
         "timestamp": "2025-03-09T14:59:50.892505",
+        "categories": []
+      }
+    ],
+    "awesome": [
+      {
+        "timestamp": "2025-03-09T15:28:11.710711",
+        "categories": []
+      }
+    ],
+    "this": [
+      {
+        "timestamp": "2025-03-09T15:28:11.710711",
+        "categories": []
+      }
+    ],
+    "timezone": [
+      {
+        "timestamp": "2025-03-09T15:28:11.710711",
         "categories": []
       }
     ]

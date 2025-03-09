@@ -28,8 +28,16 @@ class MemoryManager:
         self.zero_shot_classifier = None
         if TRANSFORMERS_AVAILABLE:
             try:
-                self.sentiment_analyzer = pipeline("sentiment-analysis")
-                self.zero_shot_classifier = pipeline("zero-shot-classification")
+                self.sentiment_analyzer = pipeline(
+                    "sentiment-analysis",
+                    model="distilbert/distilbert-base-uncased-finetuned-sst-2-english",
+                    revision="af0f99b"
+                )
+                self.zero_shot_classifier = pipeline(
+                    "zero-shot-classification",
+                    model="facebook/bart-large-mnli",
+                    revision="d7645e1"
+                )
             except Exception as e:
                 self.logger.warning(f"Error initializing transformers: {e}")
         

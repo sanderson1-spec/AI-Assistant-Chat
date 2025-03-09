@@ -37,48 +37,31 @@ class LMStudioClient:
         headers = {"Content-Type": "application/json"}
         
         # Add personality system prompt if available
-        if self.personality_manager and not any(m["role"] == "system" for m in messages):
+        if self.personality_manager:
             system_prompt = self.personality_manager.get_system_prompt()
+            # Remove any existing system message
+            messages = [m for m in messages if m["role"] != "system"]
+            # Add our system prompt at the start
             messages.insert(0, {"role": "system", "content": system_prompt})
         
         # Process interaction to get memories if personality manager is available
         if self.personality_manager and len(messages) > 0:
-            interaction_result = await self.personality_manager.process_interaction(
-                messages, context or {}
-            )
-            
-            # If we have relevant memories, add them to the context
-            if interaction_result["memories"]:
-                memory_context = "\nRelevant memories and context:\n"
-                for memory in interaction_result["memories"]:
-                    memory_context += f"- {memory['content']}\n"
+            try:
+                interaction_result = await self.personality_manager.process_interaction(
+                    messages, context or {}
+                )
                 
-                # Add memories to system message
-                if messages[0]["role"] == "system":
+                # If we have relevant memories, add them to the context
+                if interaction_result["memories"]:
+                    memory_context = "\nRelevant memories and context:\n"
+                    for memory in interaction_result["memories"]:
+                        memory_context += f"- {memory['content']}\n"
+                    
+                    # Add memories to system message
                     messages[0]["content"] += "\n" + memory_context
-                else:
-                    messages.insert(0, {
-                        "role": "system",
-                        "content": memory_context
-                    })
-        
-        # Add time context if available
-        if context and 'time_context' in context:
-            time_context_str = (
-                "Current Time Context:\n"
-                f"Current Date: {context['time_context']['current_date']}\n"
-                f"Current Time: {context['time_context']['current_time']}\n"
-                f"Current Day: {context['time_context']['current_day_of_week']}\n"
-                f"Tomorrow's Date: {context['time_context']['tomorrow_date']}\n"
-                f"Tomorrow's Day: {context['time_context']['tomorrow_day_of_week']}\n"
-                f"Timezone: {context['time_context']['timezone']}"
-            )
-            
-            # Append time context to system message if it exists
-            if messages[0]["role"] == "system":
-                messages[0]["content"] += f"\n\n{time_context_str}"
-            else:
-                messages.insert(0, {"role": "system", "content": time_context_str})
+            except Exception as e:
+                print(f"Error processing interaction: {str(e)}")
+                # Continue without memories if there's an error
         
         # Format the request payload
         payload = {
@@ -91,7 +74,7 @@ class LMStudioClient:
         try:
             endpoint = f"{self.base_url}/chat/completions"
             print(f"Sending request to LMStudio at {endpoint}")
-            print(f"Payload: {json.dumps(payload)[:100]}...")
+            print(f"Payload: {json.dumps(payload)[:500]}...")  # Log more of the payload for debugging
             
             async with aiohttp.ClientSession() as session:
                 async with session.post(
@@ -112,11 +95,11 @@ class LMStudioClient:
                     else:
                         error_text = await response.text()
                         print(f"Error from LMStudio: {error_text}")
-                        return f"Error: Failed to get response from LLM (Status {response.status}). Error: {error_text}"
+                        raise Exception(f"Failed to get response from LLM (Status {response.status}). Error: {error_text}")
         except Exception as e:
             print(f"Exception when calling LMStudio: {str(e)}")
             print(traceback.format_exc())
-            return "Error: Could not connect to LMStudio. Exception: " + str(e)
+            raise  # Re-raise the exception to be handled by the caller
     
     async def analyze_intent(self, message: str, context: Optional[Dict[str, Any]] = None) -> List[str]:
         """
