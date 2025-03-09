@@ -1,0 +1,816 @@
+{
+  "critical_events": [],
+  "important_context": [],
+  "general_knowledge": [
+    {
+      "content": "Hey, what's your name?",
+      "timestamp": "2025-03-09T11:45:01.121458",
+      "significance_score": 0.41500300176938376,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.969743013381958
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Hey, what's your name?",
+      "timestamp": "2025-03-09T11:45:02.685551",
+      "significance_score": 0.41500300176938376,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.969743013381958
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Error: Could not connect to LMStudio. Exception: 'PersonalityManager' object has no attribute 'traits'",
+      "timestamp": "2025-03-09T11:45:04.933473",
+      "significance_score": 0.4763892007668813,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9997612833976746
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Hey, what's your name?",
+      "timestamp": "2025-03-09T11:51:35.322558",
+      "significance_score": 0.41500300176938376,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.969743013381958
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Hey, what's your name?",
+      "timestamp": "2025-03-09T11:51:36.886953",
+      "significance_score": 0.41500300176938376,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.969743013381958
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Error: Could not connect to LMStudio. Exception: 'PersonalityManager' object has no attribute 'traits'",
+      "timestamp": "2025-03-09T11:51:38.853601",
+      "significance_score": 0.4763892007668813,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9997612833976746
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Hey, what's your name?",
+      "timestamp": "2025-03-09T11:56:58.618619",
+      "significance_score": 0.41500300176938376,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.969743013381958
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "I'm asking what your name is, like do you have a name?",
+      "timestamp": "2025-03-09T11:57:12.813160",
+      "significance_score": 0.46913908576965335,
+      "categories": [
+        "goal"
+      ],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9958372116088867
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "`he",
+      "timestamp": "2025-03-09T12:51:55.978876",
+      "significance_score": 0.39019339871406555,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9751777648925781
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Hi",
+      "timestamp": "2025-03-09T13:11:00.954981",
+      "significance_score": 0.4135774744351705,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9983267188072205
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "When was Einstein born?",
+      "timestamp": "2025-03-09T13:11:13.177908",
+      "significance_score": 0.47444348406791687,
+      "categories": [
+        "personal_achievement"
+      ],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9899356961250305
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Test message",
+      "timestamp": "2025-03-09T13:23:53.178606",
+      "significance_score": 0.46201406288146973,
+      "categories": [
+        "goal"
+      ],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9964088797569275
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "What's your name?",
+      "timestamp": "2025-03-09T13:24:08.105244",
+      "significance_score": 0.36809717802206676,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9468041658401489
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "Hey Amber, can you tell me what day and time is today?",
+      "timestamp": "2025-03-09T13:25:13.044056",
+      "significance_score": 0.42895714596907303,
+      "categories": [],
+      "sentiment": {
+        "label": "POSITIVE",
+        "score": 0.9936617612838745
+      },
+      "connections": [],
+      "last_recalled": null
+    },
+    {
+      "content": "What model are you? Bard? Or Llama?",
+      "timestamp": "2025-03-09T14:59:50.892505",
+      "significance_score": 0.4225795590877533,
+      "categories": [],
+      "sentiment": {
+        "label": "NEGATIVE",
+        "score": 0.9739020466804504
+      },
+      "connections": [],
+      "last_recalled": null
+    }
+  ],
+  "memory_index": {
+    "'s": [
+      {
+        "timestamp": "2025-03-09T11:45:01.121458",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:45:02.685551",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:35.322558",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:36.886953",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:56:58.618619",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T13:24:08.105244",
+        "categories": []
+      }
+    ],
+    "name": [
+      {
+        "timestamp": "2025-03-09T11:45:01.121458",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:45:02.685551",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:35.322558",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:36.886953",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:56:58.618619",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T13:24:08.105244",
+        "categories": []
+      }
+    ],
+    "what": [
+      {
+        "timestamp": "2025-03-09T11:45:01.121458",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:45:02.685551",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:35.322558",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:36.886953",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:56:58.618619",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T13:24:08.105244",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T14:59:50.892505",
+        "categories": []
+      }
+    ],
+    "hey": [
+      {
+        "timestamp": "2025-03-09T11:45:01.121458",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:45:02.685551",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:35.322558",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:36.886953",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:56:58.618619",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      }
+    ],
+    "your": [
+      {
+        "timestamp": "2025-03-09T11:45:01.121458",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:45:02.685551",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:35.322558",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:36.886953",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:56:58.618619",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T13:24:08.105244",
+        "categories": []
+      }
+    ],
+    "?": [
+      {
+        "timestamp": "2025-03-09T11:45:01.121458",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:45:02.685551",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:35.322558",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:36.886953",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:56:58.618619",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T13:11:13.177908",
+        "categories": [
+          "personal_achievement"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T13:24:08.105244",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T14:59:50.892505",
+        "categories": []
+      }
+    ],
+    ",": [
+      {
+        "timestamp": "2025-03-09T11:45:01.121458",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:45:02.685551",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:35.322558",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:36.886953",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:56:58.618619",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      }
+    ],
+    "no": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "to": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "attribute": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "connect": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "exception": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "'personalitymanager": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    ".": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "'": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "could": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "not": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    ":": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "'traits": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "has": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "lmstudio": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "error": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "object": [
+      {
+        "timestamp": "2025-03-09T11:45:04.933473",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T11:51:38.853601",
+        "categories": []
+      }
+    ],
+    "have": [
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "do": [
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "asking": [
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "is": [
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      }
+    ],
+    "a": [
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "i": [
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "you": [
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      },
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      },
+      {
+        "timestamp": "2025-03-09T14:59:50.892505",
+        "categories": []
+      }
+    ],
+    "like": [
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "'m": [
+      {
+        "timestamp": "2025-03-09T11:57:12.813160",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "`": [
+      {
+        "timestamp": "2025-03-09T12:51:55.978876",
+        "categories": []
+      }
+    ],
+    "he": [
+      {
+        "timestamp": "2025-03-09T12:51:55.978876",
+        "categories": []
+      }
+    ],
+    "hi": [
+      {
+        "timestamp": "2025-03-09T13:11:00.954981",
+        "categories": []
+      }
+    ],
+    "was": [
+      {
+        "timestamp": "2025-03-09T13:11:13.177908",
+        "categories": [
+          "personal_achievement"
+        ]
+      }
+    ],
+    "when": [
+      {
+        "timestamp": "2025-03-09T13:11:13.177908",
+        "categories": [
+          "personal_achievement"
+        ]
+      }
+    ],
+    "born": [
+      {
+        "timestamp": "2025-03-09T13:11:13.177908",
+        "categories": [
+          "personal_achievement"
+        ]
+      }
+    ],
+    "einstein": [
+      {
+        "timestamp": "2025-03-09T13:11:13.177908",
+        "categories": [
+          "personal_achievement"
+        ]
+      }
+    ],
+    "test": [
+      {
+        "timestamp": "2025-03-09T13:23:53.178606",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "message": [
+      {
+        "timestamp": "2025-03-09T13:23:53.178606",
+        "categories": [
+          "goal"
+        ]
+      }
+    ],
+    "and": [
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      }
+    ],
+    "day": [
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      }
+    ],
+    "me": [
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      }
+    ],
+    "time": [
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      }
+    ],
+    "amber": [
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      }
+    ],
+    "today": [
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      }
+    ],
+    "tell": [
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      }
+    ],
+    "can": [
+      {
+        "timestamp": "2025-03-09T13:25:13.044056",
+        "categories": []
+      }
+    ],
+    "bard": [
+      {
+        "timestamp": "2025-03-09T14:59:50.892505",
+        "categories": []
+      }
+    ],
+    "model": [
+      {
+        "timestamp": "2025-03-09T14:59:50.892505",
+        "categories": []
+      }
+    ],
+    "llama": [
+      {
+        "timestamp": "2025-03-09T14:59:50.892505",
+        "categories": []
+      }
+    ],
+    "or": [
+      {
+        "timestamp": "2025-03-09T14:59:50.892505",
+        "categories": []
+      }
+    ],
+    "are": [
+      {
+        "timestamp": "2025-03-09T14:59:50.892505",
+        "categories": []
+      }
+    ]
+  }
+}

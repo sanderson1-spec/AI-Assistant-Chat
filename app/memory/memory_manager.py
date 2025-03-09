@@ -195,8 +195,13 @@ class MemoryManager:
         Returns:
             List of relevant memories
         """
-        # Extract key terms from current context
-        current_terms = set(word.lower() for word in nltk.word_tokenize(current_context))
+        # Extract key terms from current context using standard punkt tokenizer
+        try:
+            current_terms = set(word.lower() for word in nltk.word_tokenize(current_context))
+        except Exception as e:
+            self.logger.error(f"Error tokenizing text: {str(e)}")
+            # Fallback to simple word splitting
+            current_terms = set(word.lower() for word in current_context.split())
         
         # Find memories with matching terms
         relevant_memories = []

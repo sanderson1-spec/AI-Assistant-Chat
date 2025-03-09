@@ -33,26 +33,7 @@ class ChatBot(BaseBot):
         """Process general conversation messages"""
         self.logger.info(f"ChatBot processing message: {message[:50]}...")
         
-        # Handle greetings
-        if any(greeting in message.lower() for greeting in ["hello", "hi", "hey", "greetings"]):
-            return {
-                "response": "Hello! How can I help you today?"
-            }
-        
-        # Handle thanks
-        if any(word in message.lower() for word in ["thanks", "thank you", "appreciate"]):
-            return {
-                "response": "You're welcome! Is there anything else I can help with?"
-            }
-        
-        # Handle farewells
-        if any(word in message.lower() for word in ["bye", "goodbye", "see you"]):
-            return {
-                "response": "Goodbye! Feel free to chat again whenever you need assistance."
-            }
-        
-        # For questions, general conversation, and information requests,
-        # return None to let the LLM handle it
+        # For all messages, let the LLM handle them by default
         return {"response": None}
     
     async def execute_task(self, task_type: str, params: Dict[str, Any]) -> Dict[str, Any]:

@@ -19,21 +19,54 @@ class PersonalityManager:
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.logger = logging.getLogger("ai-assistant.personality-manager")
         
-        # Active character data
+        # Initialize default values
+        self.personality_name = "default"
         self.active_character = None
         self.memory_manager = None
+        self.traits = None
         
-        # Load default character if exists
+        # Load or create default character
         self._load_default_character()
+        
+        # Initialize traits from active character
+        if self.active_character:
+            self.traits = self.active_character.get("traits", {})
+        else:
+            # This should never happen since _load_default_character always sets active_character
+            self.logger.error("Failed to initialize character")
+            self.traits = self._create_default_personality()["traits"]
     
     def _load_default_character(self):
         """Load the default character configuration"""
         default_path = self.data_dir / "default.json"
-        if default_path.exists():
+        
+        # Create default character if it doesn't exist
+        if not default_path.exists():
+            self.active_character = self._create_default_personality()
+            self.memory_manager = MemoryManager(self.active_character["id"])
+            return
+            
+        # Load existing character
+        try:
             with open(default_path, "r") as f:
                 self.active_character = json.load(f)
+                # Add default ID if not present
+                if "id" not in self.active_character:
+                    self.active_character["id"] = "default"
+                # Ensure development field exists
+                if "development" not in self.active_character:
+                    self.active_character["development"] = {
+                        "relationship_level": 0,
+                        "learned_preferences": {},
+                        "conversation_style_adaptations": {},
+                        "significant_interactions": []
+                    }
                 self.memory_manager = MemoryManager(self.active_character["id"])
-    
+        except Exception as e:
+            self.logger.error(f"Error loading default character: {e}")
+            self.active_character = self._create_default_personality()
+            self.memory_manager = MemoryManager(self.active_character["id"])
+        
     async def create_character(self, character_data: Dict[str, Any]) -> str:
         """
         Create a new character
@@ -106,6 +139,10 @@ class PersonalityManager:
         """
         if not self.active_character:
             raise ValueError("No active character loaded")
+            
+        if not self.memory_manager:
+            self.logger.warning("Memory manager not initialized, creating new one")
+            self.memory_manager = MemoryManager(self.active_character["id"])
         
         # Process conversation for memories
         await self.memory_manager.process_conversation(messages)
@@ -178,33 +215,25 @@ class PersonalityManager:
         ]
         
         # Add personality traits
-        for trait, value in char["personality_traits"].items():
+        for trait, value in char["traits"].items():
             prompt.append(f"- {trait}: {value}")
         
-        # Add backstory
-        prompt.extend([
-            "\nBackstory:",
-            char["backstory"]
-        ])
-        
-        # Add speech style
+        # Add speaking style
         prompt.extend([
             "\nSpeech Style:",
-            char["speech_style"]
+            json.dumps(char["speaking_style"], indent=2)
         ])
         
-        # Add knowledge domains
+        # Add behavioral preferences
         prompt.extend([
-            "\nKnowledge Domains:",
-            ", ".join(char["knowledge_domains"])
+            "\nBehavioral Preferences:",
+            json.dumps(char["behavioral_preferences"], indent=2)
         ])
         
-        # Add relationship context
-        development = char["development"]
+        # Add background story
         prompt.extend([
-            f"\nRelationship Level: {development['relationship_level']}/100",
-            "\nLearned about the user:",
-            ", ".join(development["learned_preferences"].keys()) or "Still learning"
+            "\nBackground:",
+            json.dumps(char["background_story"], indent=2)
         ])
         
         return "\n".join(prompt)
@@ -241,6 +270,7 @@ class PersonalityManager:
     def _create_default_personality(self) -> Dict[str, Any]:
         """Create and save a default personality configuration"""
         default_personality = {
+            "id": "default",
             "name": "AI Assistant",
             "traits": {
                 "friendliness": 0.8,
@@ -264,7 +294,16 @@ class PersonalityManager:
                 "role": "AI Assistant focused on helping with tasks and organization",
                 "expertise_areas": ["task management", "reminders", "organization"],
                 "communication_style": "Clear, friendly, and solution-oriented"
-            }
+            },
+            "development": {
+                "relationship_level": 0,
+                "learned_preferences": {},
+                "conversation_style_adaptations": {},
+                "significant_interactions": []
+            },
+            "created_at": datetime.now().isoformat(),
+            "last_interaction": None,
+            "interaction_count": 0
         }
         
         # Ensure directory exists
@@ -278,12 +317,28 @@ class PersonalityManager:
         return default_personality
     
     def adjust_response(self, response: str) -> str:
-        """Adjust a response to match personality traits"""
-        # Add emojis if configured
-        if (self.traits['speaking_style']['uses_emojis'] and 
-            self.traits['speaking_style']['emoji_frequency'] > 0):
-            # TODO: Implement emoji insertion based on context and frequency
-            pass
+        """Adjust response based on personality traits"""
+        if not self.active_character:
+            return response
+        
+        # Apply speaking style adjustments
+        if self.active_character.get('speaking_style', {}).get('uses_emojis', False):
+            # Add emojis based on content and frequency
+            emoji_frequency = self.active_character['speaking_style'].get('emoji_frequency', 0.3)
+            # TODO: Implement emoji addition based on content analysis
+            
+        # Apply formality adjustments
+        formality = self.traits.get('formality', 0.5)
+        if formality > 0.7:
+            # Make more formal
+            response = response.replace("yeah", "yes")
+            response = response.replace("nope", "no")
+            response = response.replace("gonna", "going to")
+            response = response.replace("wanna", "want to")
+        elif formality < 0.3:
+            # Make more casual
+            response = response.replace("Hello", "Hi")
+            response = response.replace("Greetings", "Hey")
         
         return response
     

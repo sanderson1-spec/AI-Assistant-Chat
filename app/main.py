@@ -83,13 +83,16 @@ os.makedirs("data", exist_ok=True)
 # Initialize database
 db = Database(db_path=CONFIG["database"]["path"])
 
+# Initialize LMStudio client first
+lmstudio_url = CONFIG["lmstudio"]["url"]
+llm_client = LMStudioClient(base_url=lmstudio_url)
+print(f"Connecting to LMStudio at: {lmstudio_url}")
+
 # Initialize personality manager
 personality_manager = PersonalityManager()
 
-# Initialize LMStudio client with personality
-lmstudio_url = CONFIG["lmstudio"]["url"]
-llm_client = LMStudioClient(base_url=lmstudio_url, personality_manager=personality_manager)
-print(f"Connecting to LMStudio at: {lmstudio_url}")
+# Set up circular references
+llm_client.set_personality_manager(personality_manager)
 
 # Initialize the Enhanced WebSocket connection manager
 manager = EnhancedConnectionManager()
@@ -99,7 +102,19 @@ bot_registry = BotRegistry(db)
 notification_service = NotificationService(db, manager)
 task_scheduler = TaskScheduler(db, bot_registry, notification_service)
 notification_service.set_task_scheduler(task_scheduler)  # Resolve circular dependency
-controller = CentralController(db, bot_registry, task_scheduler, notification_service, llm_client)
+
+# Initialize the central controller with character-driven approach
+controller = CentralController(
+    database=db,
+    personality_manager=personality_manager,
+    task_scheduler=task_scheduler,
+    notification_service=notification_service,
+    llm_client=llm_client,
+    websocket_manager=manager
+)
+
+# Update task scheduler with controller reference
+task_scheduler.set_controller(controller)
 
 # Register specialized bots - will be done in startup event to ensure proper initialization
 
@@ -534,4 +549,4 @@ async def cancel_task(task_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main:app", host=CONFIG["server"]["host"], port=CONFIG["server"]["port"], reload=CONFIG["server"]["reload"])

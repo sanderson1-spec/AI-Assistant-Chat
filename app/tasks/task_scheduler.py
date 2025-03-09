@@ -21,6 +21,12 @@ class TaskScheduler:
         self._task = None
         self.jobs = {}
         self.logger = logging.getLogger("ai-assistant.task-scheduler")
+        self.controller = None
+    
+    def set_controller(self, controller):
+        """Set the central controller reference"""
+        self.controller = controller
+        self.logger.info("Central controller reference set in TaskScheduler")
     
     async def initialize(self):
         """Initialize the scheduler and load persisted tasks"""

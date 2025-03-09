@@ -15,11 +15,16 @@ except ImportError:
 class LMStudioClient:
     """Client for interacting with locally hosted LMStudio"""
     
-    def __init__(self, base_url="http://192.168.178.182:1234/v1", api_key=None, personality_manager=None):
+    def __init__(self, base_url="http://192.168.178.182:1234/v1", api_key=None):
         self.base_url = base_url
         self.api_key = api_key
-        self.personality_manager = personality_manager
+        self.personality_manager = None
         print(f"LMStudio client initialized with URL: {base_url}")
+    
+    def set_personality_manager(self, personality_manager):
+        """Set the personality manager after initialization"""
+        self.personality_manager = personality_manager
+        print("Personality manager set for LMStudio client")
     
     async def generate_response(
         self, 
