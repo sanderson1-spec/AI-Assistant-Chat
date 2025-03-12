@@ -79,6 +79,34 @@ const WebSocketManager = {
                             });
                         }
                         break;
+                    case 'script_message':
+                        console.log('Script message received:', data);
+                        // Extract just the content from the message data
+                        const messageContent = typeof data.content === 'string' ? data.content : 
+                            (data.content && typeof data.content === 'object' && data.content.message) ? 
+                            data.content.message : String(data.content);
+                        
+                        // Display the message in chat
+                        MessageHandler.handleIncomingMessage({
+                            type: 'message',
+                            role: 'assistant',
+                            content: messageContent,
+                            conversation_id: ConversationManager.getCurrentConversationId(),
+                            timestamp: data.timestamp,
+                            character_name: data.character_name,
+                            metadata: {
+                                is_script_message: true,
+                                script_id: data.script_id,
+                                message_id: data.message_id
+                            }
+                        });
+                        
+                        // Dispatch custom event for script generator window
+                        const scriptMessageEvent = new CustomEvent('script_message', {
+                            detail: data
+                        });
+                        window.dispatchEvent(scriptMessageEvent);
+                        break;
                     case 'error':
                         console.error('Server WebSocket error:', data.message);
                         MessageHandler.displaySystemMessage(data.message || 'An error occurred');

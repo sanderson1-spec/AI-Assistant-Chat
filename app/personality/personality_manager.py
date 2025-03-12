@@ -24,6 +24,7 @@ class PersonalityManager:
         self.active_character = None
         self.memory_manager = None
         self.traits = None
+        self.llm_client = None
         
         # Load or create default character
         self._load_default_character()
@@ -507,4 +508,9 @@ class PersonalityManager:
         except Exception as e:
             print(f"Error deleting personality {filename}: {e}")
         
-        return False 
+        return False
+    
+    def set_llm_client(self, llm_client):
+        """Set the LLM client after initialization"""
+        self.llm_client = llm_client
+        self.logger.info("LLM client set for personality manager") 

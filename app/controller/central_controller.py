@@ -46,7 +46,7 @@ class CentralController:
         
         # Load Jess's character
         try:
-            asyncio.create_task(self.personality_manager.load_character("jess"))
+            asyncio.create_task(self.personality_manager.load_character("jess_1"))
             self.logger.info("Loaded Jess's character")
         except Exception as e:
             self.logger.error(f"Error loading Jess's character: {str(e)}")
@@ -234,3 +234,18 @@ class CentralController:
         except Exception as e:
             self.logger.error(f"Error getting conversation context: {str(e)}")
             return {}
+
+    async def initialize(self):
+        """Initialize the central controller and its components"""
+        try:
+            # Initialize components if they have initialization methods
+            components = [self.database, self.personality_manager, self.task_scheduler, self.notification_service]
+            for component in components:
+                if hasattr(component, 'initialize'):
+                    await component.initialize()
+            
+            self.logger.info("Central Controller initialized successfully")
+            return True
+        except Exception as e:
+            self.logger.error(f"Error initializing Central Controller: {str(e)}", exc_info=True)
+            return False

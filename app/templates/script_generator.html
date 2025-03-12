@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Script Generator</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        /* Script Generator specific styles */
+        .script-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .script-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+        
+        .script-form {
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-start;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding: 1rem 0;
+            visibility: visible !important;
+        }
+        
+        .form-actions button {
+            min-width: 120px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        .script-preview {
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+        
+        .script-messages {
+            margin-top: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.5rem;
+        }
+        
+        .script-message {
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            position: relative;
+        }
+        
+        .script-message .time {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--muted-color);
+        }
+        
+        .script-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%; /* Will be updated by JS */
+            background-color: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+        
+        .script-status {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--muted-color);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: #007bff !important;
+            color: white !important;
+            border: none !important;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3 !important;
+        }
+        
+        .btn-secondary {
+            background-color: #f8f9fa !important;
+            color: #212529 !important;
+            border: 1px solid #dee2e6 !important;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e2e6ea !important;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545 !important;
+            color: white !important;
+            border: none !important;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333 !important;
+        }
+        
+        .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Loading state */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .script-preview, .active-script {
+            margin-top: 2rem;
+        }
+        
+        .preview-info, .active-info {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background-color: var(--bg-color-light);
+            border-radius: 4px;
+        }
+        
+        .info-item {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-item label {
+            font-weight: 500;
+            min-width: 80px;
+        }
+        
+        .message-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: var(--bg-color-light);
+            border-radius: 4px;
+        }
+        
+        .script-message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background-color: var(--bg-color);
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .script-message .time {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        
+        .script-message .content {
+            white-space: pre-wrap;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--bg-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #007bff;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+        
+        .time-info {
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="script-container">
+        <div class="script-header">
+            <h1>AI Script Generator</h1>
+            <button id="close-btn" class="btn btn-secondary">Close</button>
+        </div>
+        
+        <div id="script-form-container" class="script-form">
+            <div class="form-group">
+                <label for="script-content">Script Content</label>
+                <textarea id="script-content" name="script-content" rows="10" placeholder="Enter your script here..." required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="duration">Duration (minutes)</label>
+                <select id="duration" name="duration">
+                    <option value="5">5 minutes</option>
+                    <option value="10" selected>10 minutes</option>
+                    <option value="15">15 minutes</option>
+                    <option value="20">20 minutes</option>
+                    <option value="30">30 minutes</option>
+                </select>
+            </div>
+            
+            <div class="form-actions">
+                <button id="generate-btn" class="btn btn-primary">
+                    <span id="generate-loading" class="loading hidden"></span>
+                    Generate Script
+                </button>
+                <button id="cancel-generate-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+        
+        <div id="script-preview-container" class="script-preview hidden">
+            <h2>Script Preview</h2>
+            <div class="preview-info">
+                <div class="info-item">
+                    <label>Topic:</label>
+                    <span id="preview-topic"></span>
+                </div>
+                <div class="info-item">
+                    <label>Duration:</label>
+                    <span id="preview-duration"></span> minutes
+                </div>
+                <div class="info-item">
+                    <label>Messages:</label>
+                    <span id="preview-message-count"></span>
+                </div>
+            </div>
+            <div id="preview-messages" class="message-list"></div>
+            <div class="form-actions">
+                <button id="start-script-btn" class="btn btn-primary">Start Script</button>
+                <button id="edit-script-btn" class="btn btn-secondary">Edit Script</button>
+                <button id="cancel-script-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+        
+        <div id="active-script-container" class="active-script hidden">
+            <h2>Active Script</h2>
+            <div class="active-info">
+                <div class="info-item">
+                    <label>Topic:</label>
+                    <span id="active-topic"></span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <div class="time-info">
+                    <span id="time-remaining"></span> remaining
+                    (<span id="elapsed-time"></span> / <span id="total-time"></span>)
+                </div>
+            </div>
+            <div id="active-messages" class="message-list"></div>
+            <div class="form-actions">
+                <button id="stop-script-btn" class="btn btn-danger">Stop Script</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Script Generator JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Script Generator loaded');
+            
+            // DOM Elements
+            const scriptFormContainer = document.getElementById('script-form-container');
+            const scriptPreviewContainer = document.getElementById('script-preview-container');
+            const activeScriptContainer = document.getElementById('active-script-container');
+            
+            const generateBtn = document.getElementById('generate-btn');
+            const cancelGenerateBtn = document.getElementById('cancel-generate-btn');
+            const startScriptBtn = document.getElementById('start-script-btn');
+            const editScriptBtn = document.getElementById('edit-script-btn');
+            const cancelScriptBtn = document.getElementById('cancel-script-btn');
+            const stopScriptBtn = document.getElementById('stop-script-btn');
+            const closeBtn = document.getElementById('close-btn');
+            
+            const scriptContent = document.getElementById('script-content');
+            const durationSelect = document.getElementById('duration');
+            const generateLoading = document.getElementById('generate-loading');
+            
+            console.log('DOM Elements:', {
+                scriptFormContainer,
+                generateBtn,
+                scriptContent,
+                durationSelect
+            });
+            
+            // Preview elements
+            const previewTopic = document.getElementById('preview-topic');
+            const previewDuration = document.getElementById('preview-duration');
+            const previewMessageCount = document.getElementById('preview-message-count');
+            const previewMessages = document.getElementById('preview-messages');
+            
+            // Active script elements
+            const activeTopic = document.getElementById('active-topic');
+            const timeRemaining = document.getElementById('time-remaining');
+            const progressFill = document.getElementById('progress-fill');
+            const elapsedTime = document.getElementById('elapsed-time');
+            const totalTime = document.getElementById('total-time');
+            const activeMessages = document.getElementById('active-messages');
+            
+            // State
+            let currentScript = null;
+            let scriptInterval = null;
+            let startTime = null;
+            let endTime = null;
+            let deliveredMessages = new Set();
+            
+            // Event Listeners
+            generateBtn.addEventListener('click', generateScript);
+            cancelGenerateBtn.addEventListener('click', cancelGenerate);
+            startScriptBtn.addEventListener('click', startScript);
+            editScriptBtn.addEventListener('click', editScript);
+            cancelScriptBtn.addEventListener('click', cancelScript);
+            stopScriptBtn.addEventListener('click', stopScript);
+            closeBtn.addEventListener('click', closeWindow);
+            
+            // Functions
+            function showLoading(button, loadingElement) {
+                button.disabled = true;
+                button.classList.add('btn-disabled');
+                loadingElement.classList.remove('hidden');
+            }
+            
+            function hideLoading(button, loadingElement) {
+                button.disabled = false;
+                button.classList.remove('btn-disabled');
+                loadingElement.classList.add('hidden');
+            }
+            
+            function switchToView(viewToShow) {
+                scriptFormContainer.classList.add('hidden');
+                scriptPreviewContainer.classList.add('hidden');
+                activeScriptContainer.classList.add('hidden');
+                
+                viewToShow.classList.remove('hidden');
+            }
+            
+            async function generateScript() {
+                console.log('Generate Script button clicked');
+                // Validate form
+                const content = scriptContent.value.trim();
+                const duration = parseInt(durationSelect.value);
+                
+                console.log('Form values:', { content, duration });
+                
+                if (!content) {
+                    alert('Please enter script content');
+                    return;
+                }
+                
+                // Show loading state
+                showLoading(generateBtn, generateLoading);
+                
+                try {
+                    console.log('Making API request...');
+                    // API call to generate script
+                    const response = await fetch('/api/scripts/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            topic: content,
+                            duration_minutes: duration,
+                            user_id: 'default_user' // This could be dynamic
+                        }),
+                    });
+                    
+                    console.log('API response status:', response.status);
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        console.error('API error response:', errorData);
+                        throw new Error(`Failed to generate script: ${errorData.error || response.statusText}`);
+                    }
+                    
+                    const scriptData = await response.json();
+                    console.log('Script data received:', scriptData);
+                    currentScript = scriptData;
+                    
+                    // Update preview
+                    previewTopic.textContent = scriptData.topic || content;
+                    previewDuration.textContent = scriptData.total_duration_minutes || duration;
+                    previewMessageCount.textContent = scriptData.messages ? scriptData.messages.length : 0;
+                    
+                    // Display messages in preview
+                    previewMessages.innerHTML = '';
+                    if (scriptData.messages) {
+                        scriptData.messages.forEach((message, index) => {
+                            const messageTime = new Date(message.scheduled_time);
+                            const formattedTime = `+${formatTime(
+                                (messageTime - new Date(scriptData.start_time)) / 1000
+                            )}`;
+                            
+                            const messageEl = document.createElement('div');
+                            messageEl.className = 'script-message';
+                            messageEl.innerHTML = `
+                                <div class="time">${formattedTime}</div>
+                                <div class="content">${message.content}</div>
+                            `;
+                            previewMessages.appendChild(messageEl);
+                        });
+                    }
+                    
+                    // Switch to preview view
+                    switchToView(scriptPreviewContainer);
+                    
+                } catch (error) {
+                    console.error('Error generating script:', error);
+                    alert('Failed to generate script: ' + error.message);
+                } finally {
+                    hideLoading(generateBtn, generateLoading);
+                }
+            }
+            
+            function cancelGenerate() {
+                // Return to initial state
+                scriptContent.value = '';
+                durationSelect.value = '10';
+                currentScript = null;
+            }
+            
+            async function startScript() {
+                if (!currentScript) {
+                    alert('No script to start');
+                    return;
+                }
+                
+                try {
+                    // API call to start script
+                    const response = await fetch(`/api/scripts/${currentScript.id}/start`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to start script');
+                    }
+                    
+                    const updatedScript = await response.json();
+                    currentScript = updatedScript;
+                    
+                    // Set up active script view
+                    activeTopic.textContent = currentScript.topic;
+                    startTime = new Date(currentScript.start_time);
+                    endTime = new Date(currentScript.end_time);
+                    
+                    // Initialize delivered messages tracker
+                    deliveredMessages = new Set();
+                    
+                    // Set up progress tracking
+                    totalTime.textContent = `Total: ${formatTime(currentScript.total_duration_minutes * 60)}`;
+                    updateProgress();
+                    
+                    // Set interval for updating progress
+                    scriptInterval = setInterval(updateProgress, 1000);
+                    
+                    // Switch to active view
+                    switchToView(activeScriptContainer);
+                    
+                    // Set up WebSocket listener for incoming messages
+                    setupMessageListener();
+                    
+                } catch (error) {
+                    console.error('Error starting script:', error);
+                    alert('Failed to start script: ' + error.message);
+                }
+            }
+            
+            function setupMessageListener() {
+                // This assumes the WebSocket connection is already established elsewhere
+                // and we're just adding a handler for script message events
+                if (window.socket) {
+                    // Function to handle incoming websocket messages
+                    window.addEventListener('script_message', function(event) {
+                        const message = event.detail;
+                        
+                        // Check if it's for our current script
+                        if (currentScript && message.script_id === currentScript.id) {
+                            // Add to active messages view
+                            addDeliveredMessage(message);
+                        }
+                    });
+                } else {
+                    console.error('WebSocket connection not available');
+                }
+            }
+            
+            function addDeliveredMessage(message) {
+                if (deliveredMessages.has(message.message_id)) {
+                    return; // Avoid duplicates
+                }
+                
+                deliveredMessages.add(message.message_id);
+                
+                const messageEl = document.createElement('div');
+                messageEl.className = 'script-message';
+                messageEl.innerHTML = `
+                    <div class="time">${new Date(message.timestamp).toLocaleTimeString()}</div>
+                    <div class="content">${message.content}</div>
+                `;
+                
+                activeMessages.appendChild(messageEl);
+                
+                // Scroll to bottom
+                activeMessages.scrollTop = activeMessages.scrollHeight;
+            }
+            
+            function updateProgress() {
+                if (!currentScript || !startTime || !endTime) {
+                    return;
+                }
+                
+                const now = new Date();
+                const totalDuration = (endTime - startTime) / 1000; // in seconds
+                const elapsed = (now - startTime) / 1000; // in seconds
+                const remaining = Math.max(0, totalDuration - elapsed);
+                
+                // Update time remaining
+                timeRemaining.textContent = formatTime(remaining);
+                
+                // Update progress bar
+                const progressPercent = Math.min(100, (elapsed / totalDuration) * 100);
+                progressFill.style.width = `${progressPercent}%`;
+                
+                // Update elapsed time
+                elapsedTime.textContent = `Elapsed: ${formatTime(elapsed)}`;
+                
+                // Check if script has completed
+                if (remaining <= 0) {
+                    clearInterval(scriptInterval);
+                    scriptInterval = null;
+                    
+                    // Mark as completed after a short delay
+                    setTimeout(() => {
+                        if (confirm('Script completed. Return to script generator?')) {
+                            resetScriptState();
+                            switchToView(scriptFormContainer);
+                        }
+                    }, 1000);
+                }
+            }
+            
+            function editScript() {
+                // Return to form with current values
+                if (currentScript) {
+                    scriptContent.value = currentScript.content;
+                    durationSelect.value = currentScript.total_duration_minutes;
+                }
+                
+                switchToView(scriptFormContainer);
+            }
+            
+            async function cancelScript() {
+                if (!currentScript) {
+                    switchToView(scriptFormContainer);
+                    return;
+                }
+                
+                if (confirm('Are you sure you want to cancel this script? This cannot be undone.')) {
+                    try {
+                        await fetch(`/api/scripts/${currentScript.id}/cancel`, {
+                            method: 'POST',
+                        });
+                        
+                        resetScriptState();
+                        switchToView(scriptFormContainer);
+                    } catch (error) {
+                        console.error('Error canceling script:', error);
+                        alert('Failed to cancel script: ' + error.message);
+                    }
+                }
+            }
+            
+            async function stopScript() {
+                if (!currentScript) {
+                    return;
+                }
+                
+                if (confirm('Are you sure you want to stop this active script? This cannot be undone.')) {
+                    try {
+                        await fetch(`/api/scripts/${currentScript.id}/cancel`, {
+                            method: 'POST',
+                        });
+                        
+                        clearInterval(scriptInterval);
+                        scriptInterval = null;
+                        resetScriptState();
+                        switchToView(scriptFormContainer);
+                    } catch (error) {
+                        console.error('Error stopping script:', error);
+                        alert('Failed to stop script: ' + error.message);
+                    }
+                }
+            }
+            
+            function resetScriptState() {
+                // Reset all state
+                currentScript = null;
+                startTime = null;
+                endTime = null;
+                deliveredMessages = new Set();
+                
+                if (scriptInterval) {
+                    clearInterval(scriptInterval);
+                    scriptInterval = null;
+                }
+                
+                // Clear form
+                scriptContent.value = '';
+                durationSelect.value = '10';
+                
+                // Clear preview
+                previewMessages.innerHTML = '';
+                activeMessages.innerHTML = '';
+            }
+            
+            function closeWindow() {
+                if (currentScript && currentScript.status === 'active') {
+                    if (!confirm('A script is currently active. Are you sure you want to close this window? The script will continue running in the background.')) {
+                        return;
+                    }
+                }
+                
+                // Close window/redirect back to main page
+                window.location.href = '/';
+            }
+            
+            function formatTime(seconds) {
+                seconds = Math.floor(seconds);
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }
+        });
+    </script>
+</body>
+</html> 

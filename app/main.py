@@ -32,6 +32,7 @@ from app.database.database import Database
 from app.llm.lmstudio_client import LMStudioClient
 from app.config import CONFIG, DEBUG, logger
 from app.personality.personality_manager import PersonalityManager
+from app.proactive.proactive_system import ProactiveSystem
 
 # Import AI Agents components
 from app.bots.bot_framework import BotRegistry, BaseBot, BotCapability
@@ -40,6 +41,10 @@ from app.tasks.task_scheduler import TaskScheduler
 from app.notifications.notification_service import NotificationService
 from app.controller.central_controller import CentralController
 from app.websocket.enhanced_connection_manager import EnhancedConnectionManager
+
+# Import script generator components
+from app.proactive.script_generator import ScriptGeneratorSystem
+from app.bots.script_bot import ScriptBot
 
 # Message models for request/response (from your existing code)
 from pydantic import BaseModel
@@ -118,6 +123,7 @@ personality_manager = PersonalityManager()
 
 # Set up circular references
 llm_client.set_personality_manager(personality_manager)
+personality_manager.set_llm_client(llm_client)
 
 # Initialize the Enhanced WebSocket connection manager
 manager = EnhancedConnectionManager()
@@ -141,6 +147,16 @@ controller = CentralController(
 # Update task scheduler with controller reference
 task_scheduler.set_controller(controller)
 
+# Initialize proactive system
+proactive_system = ProactiveSystem(manager, personality_manager, task_scheduler)
+
+# Initialize script generator system
+script_generator_system = ScriptGeneratorSystem(manager, personality_manager, task_scheduler, db)
+
+# Create and register bots
+reminder_bot = ReminderBot(bot_registry, notification_service, task_scheduler)
+script_bot = ScriptBot(bot_registry, manager, script_generator_system)
+
 # Register specialized bots - will be done in startup event to ensure proper initialization
 
 # Startup and shutdown events
@@ -161,8 +177,7 @@ async def startup_event():
             logger.warning("Dateparser not installed - ReminderBot will have limited functionality")
         
         # Initialize and register reminder bot
-        reminder_bot = ReminderBot()
-        bot_registry.register_bot(reminder_bot)
+        await reminder_bot.register()
         logger.info(f"Registered ReminderBot with capabilities: {[cap.name for cap in reminder_bot.capabilities]}")
     except Exception as e:
         logger.error(f"Error registering ReminderBot: {str(e)}", exc_info=True)
@@ -174,6 +189,13 @@ async def startup_event():
         logger.info(f"Registered ChatBot with capabilities: {[cap.name for cap in chat_bot.capabilities]}")
     except Exception as e:
         logger.error(f"Error registering ChatBot: {str(e)}", exc_info=True)
+
+    # Initialize and register script bot
+    try:
+        await script_bot.register()
+        logger.info(f"Registered ScriptBot with capabilities: {[cap.name for cap in script_bot.capabilities]}")
+    except Exception as e:
+        logger.error(f"Error registering ScriptBot: {str(e)}", exc_info=True)
 
     # List all registered bots and their capabilities
     all_bots = bot_registry.get_all_bots()
@@ -201,6 +223,12 @@ async def startup_event():
     except Exception as e:
         logger.error(f"Error initializing task scheduler: {str(e)}", exc_info=True)
         # Continue anyway - we can still function without the scheduler for basic chat
+    
+    # Initialize central controller last
+    await controller.initialize()
+    
+    # Load scripts from database
+    await script_generator_system.load_scripts_from_database()
     
     logger.info("AI Assistant started successfully")
 
@@ -980,6 +1008,116 @@ async def delete_record(table_name: str, record_id: str):
     except Exception as e:
         logger.error(f"Error deleting record from {table_name}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/script-generator", response_class=NoCacheTemplateResponse)
+async def get_script_generator(request: Request):
+    """Render the script generator page"""
+    return templates.TemplateResponse("script_generator.html", {"request": request})
+
+# Script Generator API Endpoints
+@app.post("/api/scripts/generate")
+async def generate_script(request: Dict[str, Any] = Body(...)):
+    """Generate a new script"""
+    try:
+        # Extract parameters
+        topic = request.get("topic")
+        duration_minutes = request.get("duration_minutes", 10)
+        user_id = request.get("user_id", "default_user")
+        
+        if not topic:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "Topic is required"}
+            )
+        
+        # Generate script
+        script = await script_generator_system.generate_script(
+            user_id=user_id,
+            topic=topic,
+            duration_minutes=duration_minutes
+        )
+        
+        return script
+    except Exception as e:
+        logger.error(f"Error generating script: {str(e)}", exc_info=DEBUG)
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to generate script: {str(e)}"}
+        )
+
+@app.post("/api/scripts/{script_id}/start")
+async def start_script(script_id: str):
+    """Start a generated script"""
+    try:
+        success = await script_generator_system.start_script(script_id)
+        
+        if not success:
+            return JSONResponse(
+                status_code=404,
+                content={"error": f"Script {script_id} not found or could not be started"}
+            )
+        
+        script = await script_generator_system.get_script(script_id)
+        return script
+    except Exception as e:
+        logger.error(f"Error starting script {script_id}: {str(e)}", exc_info=DEBUG)
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to start script: {str(e)}"}
+        )
+
+@app.post("/api/scripts/{script_id}/cancel")
+async def cancel_script(script_id: str):
+    """Cancel an active script"""
+    try:
+        success = await script_generator_system.cancel_script(script_id)
+        
+        if not success:
+            return JSONResponse(
+                status_code=404,
+                content={"error": f"Script {script_id} not found or could not be canceled"}
+            )
+        
+        return {"success": True}
+    except Exception as e:
+        logger.error(f"Error canceling script {script_id}: {str(e)}", exc_info=DEBUG)
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to cancel script: {str(e)}"}
+        )
+
+@app.get("/api/scripts")
+async def get_scripts(user_id: str = "default_user"):
+    """Get all scripts for a user"""
+    try:
+        scripts = await script_generator_system.get_user_scripts(user_id)
+        return scripts
+    except Exception as e:
+        logger.error(f"Error getting scripts for user {user_id}: {str(e)}", exc_info=DEBUG)
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to get scripts: {str(e)}"}
+        )
+
+@app.get("/api/scripts/{script_id}")
+async def get_script(script_id: str):
+    """Get a specific script by ID"""
+    try:
+        script = await script_generator_system.get_script(script_id)
+        
+        if not script:
+            return JSONResponse(
+                status_code=404,
+                content={"error": f"Script {script_id} not found"}
+            )
+        
+        return script
+    except Exception as e:
+        logger.error(f"Error getting script {script_id}: {str(e)}", exc_info=DEBUG)
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to get script: {str(e)}"}
+        )
 
 if __name__ == "__main__":
     import uvicorn

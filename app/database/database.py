@@ -98,7 +98,6 @@ class Database:
             bot_id TEXT NOT NULL,
             enabled INTEGER DEFAULT 1,
             settings TEXT,
-            updated_at TEXT NOT NULL,
             PRIMARY KEY (user_id, bot_id)
         )
         """)
@@ -108,6 +107,17 @@ class Database:
         CREATE TABLE IF NOT EXISTS conversation_context (
             conversation_id TEXT PRIMARY KEY,
             context TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+        """)
+        
+        # Scripts table for pre-planned message scripts
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS scripts (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            data TEXT NOT NULL,  -- JSON data with script contents
+            created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         )
         """)
@@ -1057,3 +1067,30 @@ class Database:
         
         # Store the updated context
         return await self.store_conversation_context(conversation_id, current_context)
+
+    async def execute_query_fetch_all(self, query: str, params: Optional[tuple] = None) -> List[tuple]:
+        """Execute a query and fetch all results"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(query, params or ())
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error executing query: {str(e)}")
+            return []
+        finally:
+            conn.close()
+
+    async def execute_query(self, query: str, params: Optional[tuple] = None) -> bool:
+        """Execute a query without returning results"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(query, params or ())
+            conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error executing query: {str(e)}")
+            return False
+        finally:
+            conn.close()

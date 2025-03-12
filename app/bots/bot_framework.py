@@ -148,15 +148,23 @@ class BotRegistry:
             self.logger.info(f"Registering task type '{task_type}' for bot {bot.id}")
             self.task_map[task_type] = bot
             
-        self.logger.info(f"Registered bot: {bot.id} ({bot.name}) with {len(bot.capabilities)} capabilities")
+        self.logger.info(f"Registered bot: {bot.id} ({bot.name}) with {len(bot.capabilities)} capabilities and {len(bot.task_types)} task types")
         
-        # Debug check that capabilities are properly registered
+        # Debug check that capabilities and tasks are properly registered
         for capability in bot.capabilities:
             bots_for_capability = self.get_bots_for_capability(capability.name)
             if bot in bots_for_capability:
                 self.logger.info(f"Confirmed: Bot {bot.id} is registered for capability '{capability.name}'")
             else:
                 self.logger.error(f"ERROR: Bot {bot.id} FAILED to register for capability '{capability.name}'")
+        
+        # Debug check that task types are properly registered
+        for task_type in bot.task_types:
+            registered_bot = self.task_map.get(task_type)
+            if registered_bot and registered_bot.id == bot.id:
+                self.logger.info(f"Confirmed: Bot {bot.id} is registered for task type '{task_type}'")
+            else:
+                self.logger.error(f"ERROR: Bot {bot.id} FAILED to register for task type '{task_type}'")
     
     def unregister_bot(self, bot_id: str) -> None:
         """Unregister a bot from the system"""
@@ -208,27 +216,28 @@ class BotRegistry:
         return list(self.bots.values())
     
     def dump_registry_state(self) -> Dict[str, Any]:
-        """Create a debug dump of the registry state"""
+        """Dump the current state of the registry for debugging"""
         state = {
             "bots": {},
             "capabilities": {},
             "tasks": {}
         }
         
-        # Dump bot info
+        # Dump bots
         for bot_id, bot in self.bots.items():
             state["bots"][bot_id] = {
                 "name": bot.name,
+                "description": bot.description,
                 "capabilities": [cap.name for cap in bot.capabilities],
                 "task_types": bot.task_types
             }
         
-        # Dump capability map
+        # Dump capabilities
         for cap_name, bots in self.capability_map.items():
             state["capabilities"][cap_name] = [bot.id for bot in bots]
-            
-        # Dump task map
+        
+        # Dump task types
         for task_type, bot in self.task_map.items():
             state["tasks"][task_type] = bot.id
-            
+        
         return state

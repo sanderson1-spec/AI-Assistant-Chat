@@ -20,12 +20,17 @@ logger = logging.getLogger("ai-assistant.reminder-bot")
 class ReminderBot(BaseBot):
     """Bot for setting and managing time-based reminders"""
     
-    def __init__(self):
+    def __init__(self, bot_registry=None, notification_service=None, task_scheduler=None):
         super().__init__(
             bot_id="reminder_bot",
             name="Reminder Assistant",
             description="I can help you set reminders and follow up at specific times."
         )
+        
+        # Store dependencies
+        self.bot_registry = bot_registry
+        self.notification_service = notification_service
+        self.task_scheduler = task_scheduler
         
         # Register capabilities
         self.register_capability(BotCapability(
@@ -41,36 +46,20 @@ class ReminderBot(BaseBot):
         logger.info(f"ReminderBot initialized with capability 'reminders'")
     
     async def process_message(self, user_id: str, message: str, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Process messages related to reminders"""
-        logger.info(f"ReminderBot processing message: {message[:50]}...")
-        
-        # Extract reminder details from message
-        reminder_info = self.extract_reminder_info(message)
-        logger.info(f"Extracted reminder info: {reminder_info}")
-        
-        # Handle different reminder intents
-        if reminder_info.get("action") == "set":
-            logger.info("Handling 'set reminder' action")
-            return await self.handle_set_reminder(user_id, reminder_info)
-            
-        elif reminder_info.get("action") == "list":
-            logger.info("Handling 'list reminders' action")
-            return await self.handle_list_reminders(user_id)
-            
-        elif reminder_info.get("action") == "cancel":
-            logger.info("Handling 'cancel reminder' action")
-            return await self.handle_cancel_reminder(user_id, reminder_info)
-            
-        else:
-            # Couldn't determine specific intent - offer help
-            logger.info("No specific reminder action detected, offering help")
-            return {
-                "response": "I can help you set reminders. Try saying something like:\n"
-                            "• Remind me to check email in 5 minutes\n"
-                            "• Set a reminder for my meeting tomorrow at 2pm\n"
-                            "• List my reminders\n"
-                            "• Cancel my reminder about the email"
-            }
+        """Process user messages - Reminder bot doesn't handle direct messages"""
+        return {"response": None}
+
+    async def register(self):
+        """Register this bot with the bot registry"""
+        try:
+            if self.bot_registry:
+                self.bot_registry.register_bot(self)
+                logging.getLogger("ai-assistant.reminder-bot").info(f"Registered {self.name} with bot registry")
+                return True
+            return False
+        except Exception as e:
+            logging.getLogger("ai-assistant.reminder-bot").error(f"Error registering {self.name}: {str(e)}", exc_info=True)
+            return False
     
     async def execute_task(self, task_type: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """Execute reminder tasks"""
